@@ -2,6 +2,8 @@ package index
 
 type Index int
 
+// Constants for index position of the piece on the board
+//goland:noinspection GoUnusedConst
 const (
 	A1 Index = 0
 	B1 Index = 1

@@ -1,7 +1,12 @@
 package board
 
+// BitBoard is representing 8x8 (64 bit) board where each bit represent existing piece on the given position
 type BitBoard uint64
 
+// BitWidth holds number of bits in the board
+const BitWidth = 64
+
+// Constants for BitBoard of single piece on the board
 const (
 	A1 BitBoard = 1
 	B1 BitBoard = 1 << 1
@@ -75,8 +80,11 @@ const (
 	G8 BitBoard = 1 << 62
 	H8 BitBoard = 1 << 63
 
-	Empty    BitBoard = 0
-	Universe          = ^Empty
+	// Empty BitBoard
+	Empty BitBoard = 0
+
+	// Universe is BitBoard with all pieces set
+	Universe = ^Empty
 )
 
 var Fields = [...]BitBoard{

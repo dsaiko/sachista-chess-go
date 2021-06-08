@@ -6,6 +6,5 @@ import (
 )
 
 func TestIndex(t *testing.T) {
-
 	assert.Equal(t, 63, int(H8-A1))
 }
