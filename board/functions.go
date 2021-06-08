@@ -2,6 +2,7 @@ package board
 
 import (
 	"math/bits"
+	"saiko.cz/sachista/index"
 )
 
 // PopCount returns the number of bits set in the board
@@ -20,6 +21,28 @@ func (b *BitBoard) BitPop() int {
 	*b &= *b - 1
 
 	return i
+}
+
+func FromNotation(notations ...string) BitBoard {
+	b := Empty
+
+	for _, n := range notations {
+		b |= FromIndex1(index.FromNotation(n))
+	}
+	return b
+}
+
+func FromIndex(indices ...index.Index) BitBoard {
+	b := Empty
+
+	for _, i := range indices {
+		b |= FromIndex1(i)
+	}
+	return b
+}
+
+func FromIndex1(i index.Index) BitBoard {
+	return 1 << i
 }
 
 func (b BitBoard) OneNorth() BitBoard {
