@@ -1,4 +1,4 @@
-package board
+package bitboard
 
 import (
 	"bytes"
@@ -7,26 +7,26 @@ import (
 	"strconv"
 )
 
-// PopCount returns the number of bits set in the board
-func (b BitBoard) PopCount() int {
+// PopCount returns the number of bits set in the bitboard
+func (b Board) PopCount() int {
 	return bits.OnesCount64(uint64(b))
 }
 
 // BitScan returns the index of first 1 bit or 64 if no bits are set
-func (b BitBoard) BitScan() int {
+func (b Board) BitScan() int {
 	return bits.TrailingZeros64(uint64(b))
 }
 
-// BitPop returns index of first set bit and resets this bit in the board
-func (b *BitBoard) BitPop() int {
+// BitPop returns index of first set bit and resets this bit in the bitboard
+func (b *Board) BitPop() int {
 	i := b.BitScan()
 	*b &= *b - 1
 
 	return i
 }
 
-// FromNotation returns BitBoard filled with pieces defined by notation parameters
-func FromNotation(notations ...string) BitBoard {
+// FromNotation returns Board filled with pieces defined by notation parameters
+func FromNotation(notations ...string) Board {
 	b := Empty
 
 	for _, n := range notations {
@@ -35,8 +35,8 @@ func FromNotation(notations ...string) BitBoard {
 	return b
 }
 
-// FromIndex returns BitBoard filled with pieces defined by index parameters
-func FromIndex(indices ...index.Index) BitBoard {
+// FromIndex returns Board filled with pieces defined by index parameters
+func FromIndex(indices ...index.Index) Board {
 	b := Empty
 
 	for _, i := range indices {
@@ -45,54 +45,54 @@ func FromIndex(indices ...index.Index) BitBoard {
 	return b
 }
 
-// FromIndex1 returns BitBoard of one piece index
-func FromIndex1(i index.Index) BitBoard {
+// FromIndex1 returns Board of one piece index
+func FromIndex1(i index.Index) Board {
 	return 1 << i
 }
 
-// OneNorth shifts all existing BitBoard pieces by one
-func (b BitBoard) OneNorth() BitBoard {
+// OneNorth shifts all existing Board pieces by one
+func (b Board) OneNorth() Board {
 	return b << 8
 }
 
-// OneSouth  shifts all existing BitBoard pieces by one
-func (b BitBoard) OneSouth() BitBoard {
+// OneSouth  shifts all existing Board pieces by one
+func (b Board) OneSouth() Board {
 	return b >> 8
 }
 
-// OneEast  shifts all existing BitBoard pieces by one
-func (b BitBoard) OneEast() BitBoard {
+// OneEast  shifts all existing Board pieces by one
+func (b Board) OneEast() Board {
 	return (b << 1) & ^FileA
 }
 
-// OneNorthEast  shifts all existing BitBoard pieces by one
-func (b BitBoard) OneNorthEast() BitBoard {
+// OneNorthEast  shifts all existing Board pieces by one
+func (b Board) OneNorthEast() Board {
 	return (b << 9) & ^FileA
 }
 
-// OneSouthEast  shifts all existing BitBoard pieces by one
-func (b BitBoard) OneSouthEast() BitBoard {
+// OneSouthEast  shifts all existing Board pieces by one
+func (b Board) OneSouthEast() Board {
 	return (b >> 7) & ^FileA
 }
 
-// OneWest  shifts all existing BitBoard pieces by one
-func (b BitBoard) OneWest() BitBoard {
+// OneWest  shifts all existing Board pieces by one
+func (b Board) OneWest() Board {
 	return (b >> 1) & ^FileH
 }
 
-// OneSouthWest  shifts all existing BitBoard pieces by one
-func (b BitBoard) OneSouthWest() BitBoard {
+// OneSouthWest  shifts all existing Board pieces by one
+func (b Board) OneSouthWest() Board {
 	return (b >> 9) & ^FileH
 }
 
-// OneNorthWest  shifts all existing BitBoard pieces by one
-func (b BitBoard) OneNorthWest() BitBoard {
+// OneNorthWest  shifts all existing Board pieces by one
+func (b Board) OneNorthWest() Board {
 	return (b << 7) & ^FileH
 }
 
-// Shift shifts all existing BitBoard pieces by multiple steps
+// Shift shifts all existing Board pieces by multiple steps
 //goland:noinspection GoAssignmentToReceiver
-func (b BitBoard) Shift(dx int, dy int) BitBoard {
+func (b Board) Shift(dx int, dy int) Board {
 
 	//dy = up/down
 	if dy > 0 {
@@ -117,8 +117,8 @@ func (b BitBoard) Shift(dx int, dy int) BitBoard {
 	return b
 }
 
-// MirrorVertical returns board with ranks (rows) in reverse order
-func (b BitBoard) MirrorVertical() BitBoard {
+// MirrorVertical returns bitboard with ranks (rows) in reverse order
+func (b Board) MirrorVertical() Board {
 	result := Empty
 
 	result |= (b >> 56) & Rank1
@@ -133,12 +133,12 @@ func (b BitBoard) MirrorVertical() BitBoard {
 	return result
 }
 
-// MirrorHorizontal returns board which mirrors the bitboard horizontally
+// MirrorHorizontal returns bitboard which mirrors the bitboard horizontally
 //goland:noinspection GoAssignmentToReceiver
-func (b BitBoard) MirrorHorizontal() BitBoard {
-	const k1 = BitBoard(0x5555555555555555)
-	const k2 = BitBoard(0x3333333333333333)
-	const k4 = BitBoard(0x0f0f0f0f0f0f0f0f)
+func (b Board) MirrorHorizontal() Board {
+	const k1 = Board(0x5555555555555555)
+	const k2 = Board(0x3333333333333333)
+	const k4 = Board(0x0f0f0f0f0f0f0f0f)
 
 	b = ((b >> 1) & k1) | ((b & k1) << 1)
 	b = ((b >> 2) & k2) | ((b & k2) << 2)
@@ -147,11 +147,11 @@ func (b BitBoard) MirrorHorizontal() BitBoard {
 	return b
 }
 
-// FlipA1H8 returns board flipped around A1H8 diagonal
-func (b BitBoard) FlipA1H8() BitBoard {
-	const k1 = BitBoard(0x5500550055005500)
-	const k2 = BitBoard(0x3333000033330000)
-	const k4 = BitBoard(0x0f0f0f0f00000000)
+// FlipA1H8 returns bitboard flipped around A1H8 diagonal
+func (b Board) FlipA1H8() Board {
+	const k1 = Board(0x5500550055005500)
+	const k2 = Board(0x3333000033330000)
+	const k4 = Board(0x0f0f0f0f00000000)
 
 	var t = k4 & (b ^ (b << 28))
 
@@ -164,8 +164,8 @@ func (b BitBoard) FlipA1H8() BitBoard {
 	return b
 }
 
-// ToIndices returns array of indices set in the BitBoard
-func (b BitBoard) ToIndices() []index.Index {
+// ToIndices returns array of indices set in the Board
+func (b Board) ToIndices() []index.Index {
 	popCount := b.PopCount()
 
 	result := make([]index.Index, popCount)
@@ -179,7 +179,7 @@ func (b BitBoard) ToIndices() []index.Index {
 	return result
 }
 
-func (b BitBoard) String() string {
+func (b Board) String() string {
 	reversedRanks := b.MirrorVertical()
 	var result bytes.Buffer
 

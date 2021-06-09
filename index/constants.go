@@ -1,8 +1,6 @@
 package index
 
-type Index int
-
-// Constants for index position of the piece on the board
+// Constants for index position of the piece on the bitboard
 //goland:noinspection GoUnusedConst
 const (
 	A1 Index = 0

@@ -1,4 +1,4 @@
-package board
+package bitboard
 
 import (
 	"github.com/stretchr/testify/assert"
