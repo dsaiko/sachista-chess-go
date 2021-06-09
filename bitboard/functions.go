@@ -181,32 +181,32 @@ func (b Board) ToIndices() []index.Index {
 
 func (b Board) String() string {
 	reversedRanks := b.MirrorVertical()
-	var result bytes.Buffer
+	var buffer bytes.Buffer
 
-	result.WriteString(header)
+	buffer.WriteString(BoardHeader)
 
 	for i := 0; i < BitWidth; i++ {
 		if (i % 8) == 0 {
 			if i > 0 {
 				//print right column digit
-				result.WriteString(strconv.Itoa(9 - (i / 8)))
-				result.WriteString("\n")
+				buffer.WriteString(strconv.Itoa(9 - (i / 8)))
+				buffer.WriteString("\n")
 			}
 
 			//print left column digit
-			result.WriteString(strconv.Itoa(8 - (i / 8)))
-			result.WriteString(" ")
+			buffer.WriteString(strconv.Itoa(8 - (i / 8)))
+			buffer.WriteString(" ")
 		}
 
 		if reversedRanks&(1<<i) != 0 {
-			result.WriteString("x ")
+			buffer.WriteString("x ")
 		} else {
-			result.WriteString("- ")
+			buffer.WriteString("- ")
 		}
 	}
 
-	result.WriteString("1\n") //last right column digit
-	result.WriteString(header)
+	buffer.WriteString("1\n") //last right column digit
+	buffer.WriteString(BoardHeader)
 
-	return result.String()
+	return buffer.String()
 }

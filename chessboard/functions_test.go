@@ -8,11 +8,11 @@ import (
 func TestBoard_RemoveCastling(t *testing.T) {
 	b := Empty()
 
-	assert.Equal(t, CastlingNone, b.castling[White])
-	assert.Equal(t, CastlingNone, b.castling[Black])
+	assert.Equal(t, CastlingNone, b.Castling[White])
+	assert.Equal(t, CastlingNone, b.Castling[Black])
 
-	b.castling[White] = CastlingBothSides
+	b.Castling[White] = CastlingBothSides
 	b.RemoveCastling(White, CastlingQueenSide)
 
-	assert.Equal(t, CastlingKingSide, b.castling[White])
+	assert.Equal(t, CastlingKingSide, b.Castling[White])
 }

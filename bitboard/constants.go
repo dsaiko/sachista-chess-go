@@ -158,4 +158,4 @@ var A8H1 = [...]Board{
 	H8,
 }
 
-const header = "  a b c d e f g h\n"
+const BoardHeader = "  a b c d e f g h\n"

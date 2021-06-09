@@ -10,7 +10,7 @@ const (
 	CastlingBothSides Castling = 3
 )
 
-//Piece index is used in ChessBoard.pieces as index
+//Piece index is used in ChessBoard.Pieces as index
 const (
 	King    Piece = 0
 	Queen   Piece = 1
