@@ -2,6 +2,7 @@ package chessboard
 
 import (
 	"bytes"
+	"regexp"
 	"saiko.cz/sachista/bitboard"
 	"strconv"
 )
@@ -41,29 +42,29 @@ func (b *Board) String() string {
 
 		switch {
 		case whiteKing&test != 0:
-			c = King.Description(White)
+			c = King.Notation(White)
 		case whiteQueen&test != 0:
-			c = Queen.Description(White)
+			c = Queen.Notation(White)
 		case whiteRook&test != 0:
-			c = Rook.Description(White)
+			c = Rook.Notation(White)
 		case whiteKnight&test != 0:
-			c = Knight.Description(White)
+			c = Knight.Notation(White)
 		case whiteBishop&test != 0:
-			c = Bishop.Description(White)
+			c = Bishop.Notation(White)
 		case whitePawn&test != 0:
-			c = Pawn.Description(White)
+			c = Pawn.Notation(White)
 		case blackKing&test != 0:
-			c = King.Description(Black)
+			c = King.Notation(Black)
 		case blackQueen&test != 0:
-			c = Queen.Description(Black)
+			c = Queen.Notation(Black)
 		case blackRook&test != 0:
-			c = Rook.Description(Black)
+			c = Rook.Notation(Black)
 		case blackKnight&test != 0:
-			c = Knight.Description(Black)
+			c = Knight.Notation(Black)
 		case blackBishop&test != 0:
-			c = Bishop.Description(Black)
+			c = Bishop.Notation(Black)
 		case blackPawn&test != 0:
-			c = Pawn.Description(Black)
+			c = Pawn.Notation(Black)
 		}
 
 		buffer.WriteByte(c)
@@ -74,4 +75,28 @@ func (b *Board) String() string {
 	buffer.WriteString(bitboard.BoardHeader)
 
 	return buffer.String()
+}
+
+func FromString(str string) *Board {
+	fen := ""
+	reHeader := regexp.MustCompile("a b c d e f g h")
+	str = reHeader.ReplaceAllString(str, "")
+
+	//create FEN string from board pieces
+	for _, c := range str {
+		piece, _ := PieceFromNotation(byte(c))
+		if piece != NoPiece {
+			fen += string(c)
+		}
+		if c == '-' {
+			fen += "1"
+		}
+	}
+
+	if len(fen) < 64 {
+		fen += "/"
+	}
+	fen += " w KQkq - 0 1"
+
+	return FromFen(fen)
 }

@@ -49,7 +49,7 @@ func (b *Board) RemoveCastling(color Color, castling Castling) {
 	b.Castling[color] = b.Castling[color] & ^castling
 }
 
-func (p Piece) Description(color Color) byte {
+func (p Piece) Notation(color Color) byte {
 	if color == White {
 		switch p {
 		case King:
@@ -82,6 +82,38 @@ func (p Piece) Description(color Color) byte {
 		}
 	}
 	return '?'
+}
+
+func PieceFromNotation(c byte) (Piece, Color) {
+	switch c {
+	case 'K':
+		return King, White
+	case 'Q':
+		return Queen, White
+	case 'B':
+		return Bishop, White
+	case 'R':
+		return Rook, White
+	case 'N':
+		return Knight, White
+	case 'P':
+		return Pawn, White
+
+	case 'k':
+		return King, Black
+	case 'q':
+		return Queen, Black
+	case 'b':
+		return Bishop, Black
+	case 'r':
+		return Rook, Black
+	case 'n':
+		return Knight, Black
+	case 'p':
+		return Pawn, Black
+	}
+
+	return NoPiece, White
 }
 
 func (c Color) String() string {

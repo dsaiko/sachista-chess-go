@@ -3,6 +3,7 @@ package chessboard
 import (
 	"bytes"
 	"saiko.cz/sachista/bitboard"
+	"saiko.cz/sachista/index"
 	"strconv"
 )
 
@@ -45,29 +46,29 @@ func (b *Board) ToFEN() string {
 
 		switch {
 		case whiteKing&test != 0:
-			c = King.Description(White)
+			c = King.Notation(White)
 		case whiteQueen&test != 0:
-			c = Queen.Description(White)
+			c = Queen.Notation(White)
 		case whiteRook&test != 0:
-			c = Rook.Description(White)
+			c = Rook.Notation(White)
 		case whiteKnight&test != 0:
-			c = Knight.Description(White)
+			c = Knight.Notation(White)
 		case whiteBishop&test != 0:
-			c = Bishop.Description(White)
+			c = Bishop.Notation(White)
 		case whitePawn&test != 0:
-			c = Pawn.Description(White)
+			c = Pawn.Notation(White)
 		case blackKing&test != 0:
-			c = King.Description(Black)
+			c = King.Notation(Black)
 		case blackQueen&test != 0:
-			c = Queen.Description(Black)
+			c = Queen.Notation(Black)
 		case blackRook&test != 0:
-			c = Rook.Description(Black)
+			c = Rook.Notation(Black)
 		case blackKnight&test != 0:
-			c = Knight.Description(Black)
+			c = Knight.Notation(Black)
 		case blackBishop&test != 0:
-			c = Bishop.Description(Black)
+			c = Bishop.Notation(Black)
 		case blackPawn&test != 0:
-			c = Pawn.Description(Black)
+			c = Pawn.Notation(Black)
 		}
 
 		if c != 0 {
@@ -86,16 +87,16 @@ func (b *Board) ToFEN() string {
 
 	//Castling
 	if b.Castling[White]&CastlingKingSide != 0 {
-		buffer.WriteByte(King.Description(White))
+		buffer.WriteByte(King.Notation(White))
 	}
 	if b.Castling[White]&CastlingQueenSide != 0 {
-		buffer.WriteByte(Queen.Description(White))
+		buffer.WriteByte(Queen.Notation(White))
 	}
 	if b.Castling[Black]&CastlingKingSide != 0 {
-		buffer.WriteByte(King.Description(Black))
+		buffer.WriteByte(King.Notation(Black))
 	}
 	if b.Castling[Black]&CastlingQueenSide != 0 {
-		buffer.WriteByte(Queen.Description(Black))
+		buffer.WriteByte(Queen.Notation(Black))
 	}
 	if b.Castling[White]|b.Castling[Black] == 0 {
 		buffer.WriteString("-")
@@ -116,4 +117,164 @@ func (b *Board) ToFEN() string {
 	buffer.WriteString(strconv.Itoa(b.FullMoveNumber))
 
 	return buffer.String()
+}
+
+func FromFen(fen string) *Board {
+	b := Empty()
+	i := 0
+	fenLength := len(fen)
+
+	for ; i < fenLength; i++ {
+		c := fen[i]
+		if c == ' ' {
+			break
+		}
+
+		if c == '/' {
+			//nothing
+			continue
+		}
+
+		if c >= '0' && c <= '9' {
+			n := c - '0'
+
+			//output number of empty fields
+			for color := White; color <= Black; color++ {
+				for piece := King; piece <= Pawn; piece++ {
+					b.Pieces[color][piece] <<= n
+				}
+			}
+		} else {
+			//output a piece
+			b.Pieces[White][King] <<= 1
+			b.Pieces[White][Queen] <<= 1
+			b.Pieces[White][Rook] <<= 1
+			b.Pieces[White][Knight] <<= 1
+			b.Pieces[White][Bishop] <<= 1
+			b.Pieces[White][Pawn] <<= 1
+
+			b.Pieces[Black][King] <<= 1
+			b.Pieces[Black][Queen] <<= 1
+			b.Pieces[Black][Rook] <<= 1
+			b.Pieces[Black][Knight] <<= 1
+			b.Pieces[Black][Bishop] <<= 1
+			b.Pieces[Black][Pawn] <<= 1
+
+			//set the new piece
+			piece, color := PieceFromNotation(c)
+			b.Pieces[color][piece] |= 1
+		}
+	}
+
+	//need to mirror the boards
+	for color := White; color <= Black; color++ {
+		for piece := King; piece <= Pawn; piece++ {
+			b.Pieces[color][piece] = b.Pieces[color][piece].MirrorHorizontal()
+		}
+	}
+
+	//next move
+	i++ //skip space
+	if i < fenLength {
+		if fen[i] == 'w' {
+			b.NextMove = White
+		} else {
+			b.NextMove = Black
+		}
+		i++
+	}
+
+	//castling
+	i++ //skip space
+	for ; i < fenLength; i++ {
+		c := fen[i]
+		if c == ' ' {
+			break
+		}
+
+		piece, color := PieceFromNotation(c)
+
+		castling := CastlingQueenSide
+		if piece == King {
+			castling = CastlingKingSide
+		}
+
+		b.Castling[color] |= castling
+	}
+
+	//enPassant
+	i++ //skip space
+	notation := ""
+	for ; i < fenLength; i++ {
+		c := fen[i]
+		if c == ' ' {
+			break
+		}
+
+		if c != '-' && len(notation) < 2 {
+			notation += string(c)
+		}
+
+		if len(notation) == 2 {
+			b.EnPassantTarget = index.FromNotation(notation)
+		}
+	}
+
+	//half move clock
+	i++ //skip space
+	n := 0
+	for ; i < fenLength; i++ {
+		c := fen[i]
+		if c == ' ' {
+			break
+		}
+
+		if c >= '0' && c <= '9' {
+			n = n*10 + int(c-'0')
+		}
+	}
+	if n != 0 {
+		b.HalfMoveClock = n
+	}
+
+	i++ //skip space
+	n = 0
+	for ; i < fenLength; i++ {
+		c := fen[i]
+		if c == ' ' {
+			break
+		}
+
+		if c >= '0' && c <= '9' {
+			n = n*10 + int(c-'0')
+		}
+	}
+	if n != 0 {
+		b.FullMoveNumber = n
+	}
+
+	//fix castling
+	if (b.Pieces[White][Rook] & bitboard.A1) == 0 {
+		b.RemoveCastling(White, CastlingQueenSide)
+	}
+	if (b.Pieces[White][Rook] & bitboard.H1) == 0 {
+		b.RemoveCastling(White, CastlingKingSide)
+	}
+	if (b.Pieces[Black][Rook] & bitboard.A8) == 0 {
+		b.RemoveCastling(Black, CastlingQueenSide)
+	}
+	if (b.Pieces[Black][Rook] & bitboard.H8) == 0 {
+		b.RemoveCastling(Black, CastlingKingSide)
+	}
+
+	//if king is misplaced, remove castling availability
+	if (b.Pieces[White][King] & bitboard.E1) == 0 {
+		b.Castling[White] = CastlingNone
+	}
+	if (b.Pieces[Black][King] & bitboard.E8) == 0 {
+		b.Castling[Black] = CastlingNone
+	}
+
+	b.UpdateZobrist()
+	return b
 }
