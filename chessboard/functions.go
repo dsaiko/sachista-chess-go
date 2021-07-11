@@ -2,8 +2,11 @@ package chessboard
 
 import (
 	"saiko.cz/sachista/bitboard"
+	"saiko.cz/sachista/index"
 	"saiko.cz/sachista/zobrist"
 )
+
+var rndZobrist = zobrist.NewZobrist()
 
 func Empty() *Board {
 	return &Board{FullMoveNumber: 1}
@@ -43,6 +46,39 @@ func (b *Board) PiecesOfColor(color Color) bitboard.Board {
 
 func (b *Board) AllPieces() bitboard.Board {
 	return b.PiecesOfColor(White) | b.PiecesOfColor(Black)
+}
+
+func (b *Board) MyColor() Color {
+	return b.NextMove
+}
+
+func (b *Board) OpponentColor() Color {
+	if b.NextMove == White {
+		return Black
+	} else {
+		return White
+	}
+}
+
+// TODO: perftest b* vs b
+func (b *Board) MyPieces() bitboard.Board {
+	return b.PiecesOfColor(b.NextMove)
+}
+
+func (b *Board) OpponentPieces() bitboard.Board {
+	return b.PiecesOfColor(b.OpponentColor())
+}
+
+func (b *Board) BoardAvailable() bitboard.Board {
+	return ^b.MyPieces()
+}
+
+func (b *Board) MyKingIndex() index.Index {
+	return index.Index(b.Pieces[b.MyColor()][King].BitScan())
+}
+
+func (b *Board) OpponentKingIndex() index.Index {
+	return index.Index(b.Pieces[b.OpponentColor()][King].BitScan())
 }
 
 func (b *Board) RemoveCastling(color Color, castling Castling) {
@@ -126,8 +162,6 @@ func (c Color) String() string {
 		return "?"
 	}
 }
-
-var rndZobrist = zobrist.NewZobrist()
 
 func (b *Board) UpdateZobrist() {
 	hash := uint64(0)

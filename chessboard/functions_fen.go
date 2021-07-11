@@ -162,7 +162,9 @@ func FromFen(fen string) *Board {
 
 			//set the new piece
 			piece, color := PieceFromNotation(c)
-			b.Pieces[color][piece] |= 1
+			if piece != NoPiece {
+				b.Pieces[color][piece] |= 1
+			}
 		}
 	}
 
