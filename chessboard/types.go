@@ -2,6 +2,7 @@ package chessboard
 
 import (
 	"saiko.cz/sachista/bitboard"
+	"saiko.cz/sachista/constants"
 	"saiko.cz/sachista/index"
 )
 
@@ -11,8 +12,8 @@ type Color int
 
 type Board struct {
 	NextMove        Color
-	Castling        [2]Castling
-	Pieces          [2][6]bitboard.Board
+	Castling        [constants.NumberOfColors]Castling
+	Pieces          [constants.NumberOfColors][constants.NumberOfPieces]bitboard.Board
 	HalfMoveClock   int
 	FullMoveNumber  int
 	EnPassantTarget index.Index

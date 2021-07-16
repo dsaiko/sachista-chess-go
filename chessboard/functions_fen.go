@@ -3,6 +3,7 @@ package chessboard
 import (
 	"bytes"
 	"saiko.cz/sachista/bitboard"
+	"saiko.cz/sachista/constants"
 	"saiko.cz/sachista/index"
 	"strconv"
 )
@@ -33,7 +34,7 @@ func (b *Board) ToFEN() string {
 		}
 	}
 
-	for i := 0; i < bitboard.BitWidth; i++ {
+	for i := 0; i < constants.NumberOfSquares; i++ {
 		if (i % 8) == 0 {
 			outputCount()
 			if i > 0 {

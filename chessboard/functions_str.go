@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"regexp"
 	"saiko.cz/sachista/bitboard"
+	"saiko.cz/sachista/constants"
 	"strconv"
 )
 
@@ -26,7 +27,7 @@ func (b *Board) String() string {
 	blackPawn := b.Pieces[Black][Pawn].MirrorVertical()
 
 	// print all 64 Pieces
-	for i := 0; i < bitboard.BitWidth; i++ {
+	for i := 0; i < constants.NumberOfSquares; i++ {
 		if (i % 8) == 0 {
 			if i > 0 {
 				buffer.WriteString(strconv.Itoa(9 - (i / 8)))

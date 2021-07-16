@@ -2,7 +2,7 @@ package zobrist
 
 import (
 	"math/rand"
-	"saiko.cz/sachista/bitboard"
+	"saiko.cz/sachista/constants"
 )
 
 func NewZobrist() *Zobrist {
@@ -11,7 +11,7 @@ func NewZobrist() *Zobrist {
 	// Generate random values for all unique states
 	// We do not need to seed the generator, numbers may be the same each time
 
-	for square := 0; square < bitboard.BitWidth; square++ {
+	for square := 0; square < constants.NumberOfSquares; square++ {
 		for side := 0; side < 2; side++ {
 			for piece := 0; piece < 7; piece++ {
 				z.RndPieces[side][piece][square] = rand.Uint64()

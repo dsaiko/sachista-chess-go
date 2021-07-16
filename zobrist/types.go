@@ -1,5 +1,7 @@
 package zobrist
 
+import "saiko.cz/sachista/constants"
+
 /// RANDOM RKISS is our pseudo random number generator (PRNG) used to compute hash keys.
 /// George Marsaglia invented the RNG-Kiss-family in the early 90's. This is a
 /// specific version that Heinz van Saanen derived from some public domain code
@@ -17,8 +19,8 @@ package zobrist
 /// PRNG Inspired by Stockfish GPL source code
 
 type Zobrist struct {
-	RndPieces    [2][7][64]uint64
-	RndCastling  [2][4]uint64
-	RndEnPassant [64]uint64
+	RndPieces    [constants.NumberOfColors][constants.NumberOfPieces + 1][constants.NumberOfSquares]uint64
+	RndCastling  [constants.NumberOfColors][constants.NumberOfCastlingOptions]uint64
+	RndEnPassant [constants.NumberOfSquares]uint64
 	RndSide      uint64
 }

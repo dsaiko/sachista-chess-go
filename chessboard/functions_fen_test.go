@@ -10,10 +10,13 @@ import (
 func TestBoard_ToFEN(t *testing.T) {
 	b := StandardBoard()
 	b2 := FromFen(b.ToFEN())
+	b3 := FromFen(StandardBoardFEN)
 
 	assert.Equal(t, b.ZobristHash, b2.ZobristHash)
 	assert.Equal(t, b.String(), b2.String())
 	assert.Equal(t, b.ToFEN(), b2.ToFEN())
+	assert.Equal(t, b.ToFEN(), StandardBoardFEN)
+	assert.Equal(t, b.ZobristHash, b3.ZobristHash)
 
 	assert.Equal(t, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", b.ToFEN())
 

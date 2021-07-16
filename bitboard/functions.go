@@ -3,6 +3,7 @@ package bitboard
 import (
 	"bytes"
 	"math/bits"
+	"saiko.cz/sachista/constants"
 	"saiko.cz/sachista/index"
 	"strconv"
 )
@@ -185,7 +186,7 @@ func (b Board) String() string {
 
 	buffer.WriteString(BoardHeader)
 
-	for i := 0; i < BitWidth; i++ {
+	for i := 0; i < constants.NumberOfSquares; i++ {
 		if (i % 8) == 0 {
 			if i > 0 {
 				//print right column digit
