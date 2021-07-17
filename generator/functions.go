@@ -22,11 +22,33 @@ func (b *Move) String() string {
 //TODO test *Board
 func Attacks(board *chessboard.Board, color chessboard.Color) bitboard.Board {
 	return KnightAttacks(board, color) |
-		PawnAttacks(board, color)
+		PawnAttacks(board, color) |
+		KingAttacks(board, color)
+}
+
+//TODO test *
+func IsBitmaskUnderAttack(board *chessboard.Board, color chessboard.Color, fields bitboard.Board) bool {
+	attacks := KnightAttacks(board, color)
+	if attacks&fields != 0 {
+		return true
+	}
+
+	attacks = PawnAttacks(board, color)
+	if attacks&fields != 0 {
+		return true
+	}
+
+	attacks = KingAttacks(board, color)
+	if attacks&fields != 0 {
+		return true
+	}
+
+	return false
 }
 
 //TODO test *Board
 func Moves(board *chessboard.Board, moves *[]Move) {
 	KnightMoves(board, moves)
 	PawnMoves(board, moves)
+	KingMoves(board, moves)
 }

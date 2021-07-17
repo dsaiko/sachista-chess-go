@@ -7,12 +7,12 @@ import (
 	"saiko.cz/sachista/index"
 )
 
-var knightMoveCache [constants.NumberOfSquares]bitboard.Board
+var knightMovesCache [constants.NumberOfSquares]bitboard.Board
 
 func init() {
 	for i := 0; i < constants.NumberOfSquares; i++ {
 		piece := bitboard.FromIndex1(index.Index(i))
-		knightMoveCache[i] =
+		knightMovesCache[i] =
 			piece.Shift(2, 1) |
 				piece.Shift(2, -1) |
 				piece.Shift(1, 2) |
@@ -29,7 +29,7 @@ func KnightAttacks(board *chessboard.Board, color chessboard.Color) bitboard.Boa
 	attacks := bitboard.Empty
 
 	for pieces != bitboard.Empty {
-		attacks |= knightMoveCache[pieces.BitPop()]
+		attacks |= knightMovesCache[pieces.BitPop()]
 	}
 
 	return attacks
@@ -41,7 +41,7 @@ func KnightMoves(board *chessboard.Board, moves *[]Move) {
 
 	for pieces != bitboard.Empty {
 		sourceIndex := pieces.BitPop()
-		target := knightMoveCache[sourceIndex] & board.BoardAvailable()
+		target := knightMovesCache[sourceIndex] & board.BoardAvailable()
 
 		for target != bitboard.Empty {
 			targetIndex := target.BitPop()

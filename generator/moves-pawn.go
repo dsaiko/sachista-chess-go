@@ -7,22 +7,22 @@ import (
 	"saiko.cz/sachista/index"
 )
 
-var pawnMoves [constants.NumberOfColors][constants.NumberOfSquares]bitboard.Board
-var pawnDoubleMoves [constants.NumberOfColors][constants.NumberOfSquares]bitboard.Board
-var pawnAttacks [constants.NumberOfColors][constants.NumberOfSquares]bitboard.Board
+var pawnMovesCache [constants.NumberOfColors][constants.NumberOfSquares]bitboard.Board
+var pawnDoubleMovesCache [constants.NumberOfColors][constants.NumberOfSquares]bitboard.Board
+var pawnAttacksCache [constants.NumberOfColors][constants.NumberOfSquares]bitboard.Board
 
 func init() {
 	//TODO: perf test function instead of memory constants?
 	for i := 0; i < constants.NumberOfSquares; i++ {
 		piece := bitboard.FromIndex1(index.Index(i))
 
-		pawnMoves[chessboard.White][i] = piece.Shift(0, 1)
-		pawnDoubleMoves[chessboard.White][i] = piece.Shift(0, 2)
-		pawnAttacks[chessboard.White][i] = piece.Shift(1, 1) | piece.Shift(-1, 1)
+		pawnMovesCache[chessboard.White][i] = piece.Shift(0, 1)
+		pawnDoubleMovesCache[chessboard.White][i] = piece.Shift(0, 2)
+		pawnAttacksCache[chessboard.White][i] = piece.Shift(1, 1) | piece.Shift(-1, 1)
 
-		pawnMoves[chessboard.Black][i] = piece.Shift(0, -1)
-		pawnDoubleMoves[chessboard.Black][i] = piece.Shift(0, -2)
-		pawnAttacks[chessboard.Black][i] = piece.Shift(1, -1) | piece.Shift(-1, -1)
+		pawnMovesCache[chessboard.Black][i] = piece.Shift(0, -1)
+		pawnDoubleMovesCache[chessboard.Black][i] = piece.Shift(0, -2)
+		pawnAttacksCache[chessboard.Black][i] = piece.Shift(1, -1) | piece.Shift(-1, -1)
 	}
 }
 
@@ -56,7 +56,7 @@ func PawnMoves(board *chessboard.Board, moves *[]Move) {
 
 		//get possible moves - moves minus my onw color
 		//one step forward
-		movesBoard := pawnMoves[board.NextMove][sourceIndex] & emptyBoard
+		movesBoard := pawnMovesCache[board.NextMove][sourceIndex] & emptyBoard
 
 		//if one step forward was successful and we are on base rank, try double move
 		if movesBoard != emptyBoard && sourceIndex < whiteBaseRank {
@@ -66,7 +66,7 @@ func PawnMoves(board *chessboard.Board, moves *[]Move) {
 		}
 
 		//get attacks, only against opponent pieces
-		attacks := pawnAttacks[board.NextMove][sourceIndex]
+		attacks := pawnAttacksCache[board.NextMove][sourceIndex]
 		movesBoard |= attacks & board.OpponentPieces()
 
 		//for all moves
