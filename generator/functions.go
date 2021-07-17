@@ -23,7 +23,9 @@ func (b *Move) String() string {
 func Attacks(board *chessboard.Board, color chessboard.Color) bitboard.Board {
 	return KnightAttacks(board, color) |
 		PawnAttacks(board, color) |
-		KingAttacks(board, color)
+		KingAttacks(board, color) |
+		RookAttacks(board, color) |
+		BishopAttacks(board, color)
 }
 
 //TODO test *
@@ -43,6 +45,16 @@ func IsBitmaskUnderAttack(board *chessboard.Board, color chessboard.Color, field
 		return true
 	}
 
+	attacks = RookAttacks(board, color)
+	if attacks&fields != 0 {
+		return true
+	}
+
+	attacks = BishopAttacks(board, color)
+	if attacks&fields != 0 {
+		return true
+	}
+
 	return false
 }
 
@@ -51,4 +63,6 @@ func Moves(board *chessboard.Board, moves *[]Move) {
 	KnightMoves(board, moves)
 	PawnMoves(board, moves)
 	KingMoves(board, moves)
+	RookMoves(board, moves)
+	BishopMoves(board, moves)
 }
