@@ -182,7 +182,7 @@ func RookMoves(board *chessboard.Board, moves *[]Move) {
 			}
 		}
 		//switch to queen
-		movingPiece := chessboard.Queen
+		movingPiece = chessboard.Queen
 		rook = board.Pieces[board.NextMove][movingPiece]
 	}
 }

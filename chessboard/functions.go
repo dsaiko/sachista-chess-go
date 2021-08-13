@@ -82,7 +82,7 @@ func (b *Board) OpponentKingIndex() index.Index {
 }
 
 func (b *Board) RemoveCastling(color Color, castling Castling) {
-	b.Castling[color] = b.Castling[color] & ^castling
+	b.Castling[color] &= ^castling
 }
 
 func (p Piece) Notation(color Color) byte {

@@ -245,7 +245,7 @@ func BishopMoves(board *chessboard.Board, moves *[]Move) {
 			}
 		}
 		//switch to queen
-		movingPiece := chessboard.Queen
+		movingPiece = chessboard.Queen
 		bishop = board.Pieces[board.NextMove][movingPiece]
 	}
 }

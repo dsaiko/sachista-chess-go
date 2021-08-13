@@ -6,14 +6,14 @@ import (
 	"saiko.cz/sachista/chessboard"
 )
 
-func (b *Move) String() string {
+func (m *Move) String() string {
 	var buffer bytes.Buffer
 
-	buffer.WriteString(b.From.String())
-	buffer.WriteString(b.To.String())
+	buffer.WriteString(m.From.String())
+	buffer.WriteString(m.To.String())
 
-	if b.PromotionPiece > 0 { //this excludes NoPiece and King
-		buffer.WriteString(string(b.PromotionPiece.Notation(chessboard.Black)))
+	if m.PromotionPiece > 0 { //this excludes NoPiece and King
+		buffer.WriteString(string(m.PromotionPiece.Notation(chessboard.Black)))
 	}
 
 	return buffer.String()
@@ -58,7 +58,10 @@ func IsBitmaskUnderAttack(board *chessboard.Board, color chessboard.Color, field
 	return false
 }
 
+//TODO reorganize
+//TODO make function which returns only legal moves
 //TODO test *Board
+//TODO rename to CompuTEMoves
 func Moves(board *chessboard.Board, moves *[]Move) {
 	KnightMoves(board, moves)
 	PawnMoves(board, moves)
