@@ -67,22 +67,25 @@ func perfT1(cache *PerfTCache, b *chessboard.Board, depth int) uint64 {
 		sourceBitBoard := bitboard.FromIndex1(m.From)
 		isKingMove := m.Piece == chessboard.King
 
-		if isKingMove || isCheck || (sourceBitBoard&attacks) != 0 || m.IsEnPassant {
-			// need to validate move
-			nextBoard := m.MakeMove(*b)
-			if isOpponentsKingNotUnderCheck(nextBoard) {
-				if depth == 1 {
+		needToValidate := isKingMove || isCheck || sourceBitBoard&attacks != 0 || m.IsEnPassant
+
+		if depth == 1 {
+			if needToValidate {
+				// need to validate move
+				nextBoard := m.MakeMove(*b)
+				if isOpponentsKingNotUnderCheck(nextBoard) {
 					count++
-				} else {
-					count += perfT1(cache, nextBoard, depth-1)
 				}
+			} else {
+				count++
 			}
 		} else {
-			if depth == 1 {
-				count++
+			nextBoard := m.MakeMove(*b)
+			if needToValidate {
+				if isOpponentsKingNotUnderCheck(nextBoard) {
+					count += perfT1(cache, nextBoard, depth-1)
+				}
 			} else {
-				// do not need to validate legality of the move
-				nextBoard := m.MakeMove(*b)
 				count += perfT1(cache, nextBoard, depth-1)
 			}
 		}
