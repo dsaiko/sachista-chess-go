@@ -32,7 +32,7 @@ func pawnAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board 
 	return board.Pieces[color][chessboard.Pawn].OneSouthEast() | board.Pieces[color][chessboard.Pawn].OneSouthWest()
 }
 
-func pawnMoves(board chessboard.Board, moves *[]Move) {
+func pawnMoves(board chessboard.Board, handler MoveHandler) {
 	emptyBoard := ^board.BoardOfAllPieces()
 
 	whiteBaseRank := 16
@@ -74,13 +74,13 @@ func pawnMoves(board chessboard.Board, moves *[]Move) {
 
 			// promotion?
 			if targetIndex > whitePromotionRank || targetIndex < blackPromotionRank {
-				*moves = append(*moves, Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Bishop})
-				*moves = append(*moves, Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Knight})
-				*moves = append(*moves, Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Queen})
-				*moves = append(*moves, Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Rook})
+				handler(Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Bishop})
+				handler(Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Knight})
+				handler(Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Queen})
+				handler(Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Rook})
 			} else {
 				// normal move/capture
-				*moves = append(*moves, Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex)})
+				handler(Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex)})
 			}
 		}
 
@@ -89,7 +89,7 @@ func pawnMoves(board chessboard.Board, moves *[]Move) {
 			movesBoard = attacks & bitboard.FromIndex1(board.EnPassantTarget)
 			if movesBoard != bitboard.Empty {
 				targetIndex := movesBoard.BitScan()
-				*moves = append(*moves, Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), IsEnPassant: true})
+				handler(Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), IsEnPassant: true})
 			}
 		}
 	}

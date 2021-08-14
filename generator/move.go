@@ -6,6 +6,8 @@ import (
 	"saiko.cz/sachista/index"
 )
 
+type MoveHandler func(Move)
+
 type Move struct {
 	Piece chessboard.Piece
 	From  index.Index

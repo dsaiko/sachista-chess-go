@@ -35,7 +35,7 @@ func knightAttacks(board chessboard.Board, color chessboard.Color) bitboard.Boar
 	return attacks
 }
 
-func KnightMoves(board chessboard.Board, moves *[]Move) {
+func KnightMoves(board chessboard.Board, handler MoveHandler) {
 	pieces := board.Pieces[board.NextMove][chessboard.Knight]
 
 	for pieces != bitboard.Empty {
@@ -44,7 +44,7 @@ func KnightMoves(board chessboard.Board, moves *[]Move) {
 
 		for target != bitboard.Empty {
 			targetIndex := target.BitPop()
-			*moves = append(*moves, Move{Piece: chessboard.Knight, From: index.Index(sourceIndex), To: index.Index(targetIndex)})
+			handler(Move{Piece: chessboard.Knight, From: index.Index(sourceIndex), To: index.Index(targetIndex)})
 		}
 	}
 }

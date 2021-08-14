@@ -162,7 +162,7 @@ func rookAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board 
 	return attacks
 }
 
-func RookMoves(board chessboard.Board, moves *[]Move) {
+func RookMoves(board chessboard.Board, handler MoveHandler) {
 	movingPiece := chessboard.Rook
 	rook := board.Pieces[board.NextMove][movingPiece]
 
@@ -180,7 +180,7 @@ func RookMoves(board chessboard.Board, moves *[]Move) {
 			// for all moves
 			for movesBoard != bitboard.Empty {
 				toIndex := movesBoard.BitPop()
-				*moves = append(*moves, Move{Piece: movingPiece, From: index.Index(fromIndex), To: index.Index(toIndex)})
+				handler(Move{Piece: movingPiece, From: index.Index(fromIndex), To: index.Index(toIndex)})
 			}
 		}
 		// switch to queen

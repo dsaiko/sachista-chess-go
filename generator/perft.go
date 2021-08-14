@@ -56,13 +56,10 @@ func perfT1(cache *PerfTCache, b chessboard.Board, depth int) uint64 {
 		return count
 	}
 
-	// generate pseudo legal moves
-	moves := generatePseudoLegalMoves(b)
-
 	attacks := attacks(b, b.OpponentColor())
 	isCheck := attacks&b.Pieces[b.NextMove][chessboard.King] != 0
 
-	for _, m := range moves {
+	handler := func(m Move) {
 		sourceBitBoard := bitboard.FromIndex1(m.From)
 		isKingMove := m.Piece == chessboard.King
 
@@ -80,6 +77,9 @@ func perfT1(cache *PerfTCache, b chessboard.Board, depth int) uint64 {
 			}
 		}
 	}
+
+	// generate pseudo legal moves
+	generatePseudoLegalMoves(b, handler)
 
 	// DEBUG OUTPUT FOR UTILS/PERFT-STOKFISH-CHECK.SH:
 	// fmt.Printf("%v|%v|%v\n",b.ToFEN(), depth, count)

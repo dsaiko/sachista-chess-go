@@ -3,7 +3,6 @@ package generator
 import (
 	"saiko.cz/sachista/bitboard"
 	"saiko.cz/sachista/chessboard"
-	"saiko.cz/sachista/constants"
 )
 
 // attacks of all pieces
@@ -31,26 +30,24 @@ func isBitmaskUnderAttack(board chessboard.Board, color chessboard.Color, fields
 }
 
 // generatePseudoLegalMoves without checking legality of king check
-func generatePseudoLegalMoves(b chessboard.Board) []Move {
-	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
-	KnightMoves(b, &moves)
-	pawnMoves(b, &moves)
-	KingMoves(b, &moves)
-	RookMoves(b, &moves)
-	BishopMoves(b, &moves)
-	return moves
+func generatePseudoLegalMoves(b chessboard.Board, handler MoveHandler) {
+	KnightMoves(b, handler)
+	pawnMoves(b, handler)
+	KingMoves(b, handler)
+	RookMoves(b, handler)
+	BishopMoves(b, handler)
 }
 
 // GenerateLegalMoves ...
 func GenerateLegalMoves(b chessboard.Board) []Move {
-	moves := generatePseudoLegalMoves(b)
-	legalMoves := make([]Move, 0, len(moves))
+	const MovesCacheInitialCapacity = 32
+	legalMoves := make([]Move, 0, MovesCacheInitialCapacity)
 
-	for _, m := range moves {
+	generatePseudoLegalMoves(b, func(m Move) {
 		if isOpponentsKingNotUnderCheck(m.MakeMove(b)) {
 			legalMoves = append(legalMoves, m)
 		}
-	}
+	})
 
 	return legalMoves
 }

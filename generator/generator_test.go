@@ -19,14 +19,20 @@ func TestMove_String(t *testing.T) {
 
 func testMovesFromString(t *testing.T, expectedCount int, stringBoard string) {
 	board := chessboard.FromString(stringBoard)
-	moves := generatePseudoLegalMoves(board)
-	assert.Equal(t, expectedCount, len(moves))
+	size := 0
+	generatePseudoLegalMoves(board, func(m Move) {
+		size++
+	})
+	assert.Equal(t, expectedCount, size)
 }
 
 func testMovesFromFEN(t *testing.T, expectedCount int, fen string) {
 	board := chessboard.FromFEN(fen)
-	moves := generatePseudoLegalMoves(board)
-	assert.Equal(t, expectedCount, len(moves))
+	size := 0
+	generatePseudoLegalMoves(board, func(m Move) {
+		size++
+	})
+	assert.Equal(t, expectedCount, size)
 }
 
 func Test_isOpponentsKingNotUnderCheck(t *testing.T) {

@@ -224,7 +224,7 @@ func bishopAttacks(board chessboard.Board, color chessboard.Color) bitboard.Boar
 	return attacks
 }
 
-func BishopMoves(board chessboard.Board, moves *[]Move) {
+func BishopMoves(board chessboard.Board, handler MoveHandler) {
 	movingPiece := chessboard.Bishop
 	bishop := board.Pieces[board.NextMove][movingPiece]
 
@@ -242,7 +242,7 @@ func BishopMoves(board chessboard.Board, moves *[]Move) {
 			// for all moves
 			for movesBoard != bitboard.Empty {
 				toIndex := movesBoard.BitPop()
-				*moves = append(*moves, Move{Piece: movingPiece, From: index.Index(fromIndex), To: index.Index(toIndex)})
+				handler(Move{Piece: movingPiece, From: index.Index(fromIndex), To: index.Index(toIndex)})
 			}
 		}
 		// switch to queen
