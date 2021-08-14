@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"saiko.cz/sachista/chessboard"
 
+	"saiko.cz/sachista/chessboard"
 	"saiko.cz/sachista/index"
 )
 
@@ -19,13 +19,13 @@ func TestMove_String(t *testing.T) {
 
 func testMovesFromString(t *testing.T, expectedCount int, stringBoard string) {
 	board := chessboard.FromString(stringBoard)
-	moves := GeneratePseudoLegalMoves(board)
+	moves := generatePseudoLegalMoves(board)
 	assert.Equal(t, expectedCount, len(moves))
 }
 
 func testMovesFromFEN(t *testing.T, expectedCount int, fen string) {
 	board := chessboard.FromFEN(fen)
-	moves := GeneratePseudoLegalMoves(board)
+	moves := generatePseudoLegalMoves(board)
 	assert.Equal(t, expectedCount, len(moves))
 }
 

@@ -65,9 +65,9 @@ func perfT1(cache *PerfTCache, b *chessboard.Board, depth int) uint64 {
 	}
 
 	// generate pseudo legal moves
-	moves := GeneratePseudoLegalMoves(b)
+	moves := generatePseudoLegalMoves(b)
 
-	attacks := Attacks(b, b.OpponentColor())
+	attacks := attacks(b, b.OpponentColor())
 	isCheck := attacks&b.Pieces[b.NextMove][chessboard.King] != 0
 
 	for _, m := range moves {

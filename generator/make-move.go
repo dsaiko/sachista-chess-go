@@ -6,10 +6,6 @@ import (
 	"saiko.cz/sachista/index"
 )
 
-//TODO: test return new board vs apply to existing
-//TODO: try undo move
-//TODO: try recompute zobrist vs modify zobrist
-//TODO: test pointers
 func (m *Move) MakeMove(board chessboard.Board) *chessboard.Board {
 	sourceIndex := m.From
 	targetIndex := m.To
