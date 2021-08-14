@@ -62,6 +62,7 @@ func IsBitmaskUnderAttack(board *chessboard.Board, color chessboard.Color, field
 //TODO reorganize
 //TODO make function which returns only legal moves
 //TODO test *Board
+//TODO test *[]*Move
 func GeneratePseudoLegalMoves(b *chessboard.Board, moves *[]Move) {
 	KnightMoves(b, moves)
 	PawnMoves(b, moves)
