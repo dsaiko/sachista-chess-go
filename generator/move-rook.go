@@ -155,9 +155,11 @@ func RookAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board 
 	pieces := board.Pieces[color][chessboard.Rook] | board.Pieces[color][chessboard.Queen]
 	attacks := bitboard.Empty
 
+	allPieces := board.BoardOfAllPieces()
+
 	// for all rooks
 	for pieces != bitboard.Empty {
-		attacks |= oneRookAttacks(pieces.BitPop(), board.BoardOfAllPieces()) //TODO: try to cache BoardOfAllPieces
+		attacks |= oneRookAttacks(pieces.BitPop(), allPieces)
 	}
 	return attacks
 }
@@ -166,6 +168,9 @@ func RookMoves(board chessboard.Board, moves *[]Move) {
 	movingPiece := chessboard.Rook
 	rook := board.Pieces[board.NextMove][movingPiece]
 
+	allPieces := board.BoardOfAllPieces()
+	boardAvailable := board.BoardAvailableToAttack()
+
 	for i := 0; i < 2; i++ { // rooks and queens
 
 		// for all rooks
@@ -173,7 +178,7 @@ func RookMoves(board chessboard.Board, moves *[]Move) {
 			// get next rook
 			fromIndex := rook.BitPop()
 
-			movesBoard := oneRookAttacks(fromIndex, board.BoardOfAllPieces()) & board.BoardAvailableToAttack() //TODO: try to cache BoardOfAllPieces and BoardAvailableToAttack
+			movesBoard := oneRookAttacks(fromIndex, allPieces) & boardAvailable
 
 			// for all moves
 			for movesBoard != bitboard.Empty {

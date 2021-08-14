@@ -12,7 +12,6 @@ var pawnDoubleMovesCache [constants.NumberOfColors][constants.NumberOfSquares]bi
 var pawnAttacksCache [constants.NumberOfColors][constants.NumberOfSquares]bitboard.Board
 
 func init() {
-	//TODO: perf test function instead of memory constants?
 	for i := 0; i < constants.NumberOfSquares; i++ {
 		piece := bitboard.FromIndex1(index.Index(i))
 
