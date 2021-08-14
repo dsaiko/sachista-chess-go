@@ -18,14 +18,10 @@ type PerfTCacheEntry struct {
 type PerfTCache struct {
 	entries   []PerfTCacheEntry
 	cacheSize uint64
-	mux       sync.Mutex
 }
 
 // set cache item - synchronized method
 func (c *PerfTCache) set(hash uint64, depth int, count uint64) {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-
 	entry := &c.entries[(c.cacheSize-1)&hash]
 
 	entry.hash = hash
@@ -35,9 +31,6 @@ func (c *PerfTCache) set(hash uint64, depth int, count uint64) {
 
 // get cache item - synchronized method
 func (c *PerfTCache) get(hash uint64, depth int) uint64 {
-	c.mux.Lock()
-	defer c.mux.Unlock()
-
 	entry := &c.entries[(c.cacheSize-1)&hash]
 
 	if entry.hash == hash && entry.depth == depth {
@@ -108,7 +101,6 @@ func PerfT(b chessboard.Board, depth int) uint64 {
 		return uint64(len(moves))
 	}
 
-	cache := newCache(16 * 1024 * 1024)
 	results := make(chan uint64, len(moves))
 	var wg sync.WaitGroup
 
@@ -117,6 +109,7 @@ func PerfT(b chessboard.Board, depth int) uint64 {
 		wg.Add(1)
 		go func(b chessboard.Board) {
 			defer wg.Done()
+			cache := newCache(1024 * 1024)
 			results <- perfT1(cache, b, depth-1)
 		}(m.MakeMove(b))
 	}
