@@ -10,7 +10,7 @@ import (
 )
 
 // ToFEN converts board to FEN notation string
-func (b *Board) ToFEN() string {
+func (b Board) ToFEN() string {
 
 	var buffer bytes.Buffer
 
@@ -123,7 +123,7 @@ func (b *Board) ToFEN() string {
 }
 
 // FromFEN converts FEN string to board object
-func FromFEN(fen string) *Board {
+func FromFEN(fen string) Board {
 	b := Empty()
 	i := 0
 	fenLength := len(fen)

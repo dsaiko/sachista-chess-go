@@ -33,7 +33,7 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 
 	tests := []struct {
 		name  string
-		board *chessboard.Board
+		board chessboard.Board
 		want  bool
 	}{
 		{

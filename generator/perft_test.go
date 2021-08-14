@@ -11,7 +11,7 @@ import (
 
 func TestPerfT(t *testing.T) {
 	tests := []struct {
-		board *chessboard.Board
+		board chessboard.Board
 		depth int
 		want  uint64
 	}{

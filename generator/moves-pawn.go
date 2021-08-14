@@ -26,7 +26,7 @@ func init() {
 	}
 }
 
-func PawnAttacks(board *chessboard.Board, color chessboard.Color) bitboard.Board {
+func PawnAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
 	if color == chessboard.White {
 		return board.Pieces[color][chessboard.Pawn].OneNorthEast() | board.Pieces[color][chessboard.Pawn].OneNorthWest()
 	} else {
@@ -34,7 +34,7 @@ func PawnAttacks(board *chessboard.Board, color chessboard.Color) bitboard.Board
 	}
 }
 
-func PawnMoves(board *chessboard.Board, moves *[]Move) {
+func PawnMoves(board chessboard.Board, moves *[]Move) {
 	emptyBoard := ^board.BoardOfAllPieces()
 
 	whiteBaseRank := 16

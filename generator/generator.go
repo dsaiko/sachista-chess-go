@@ -7,7 +7,7 @@ import (
 )
 
 // attacks of all pieces
-func attacks(board *chessboard.Board, color chessboard.Color) bitboard.Board {
+func attacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
 	return KnightAttacks(board, color) |
 		PawnAttacks(board, color) |
 		KingAttacks(board, color) |
@@ -16,7 +16,7 @@ func attacks(board *chessboard.Board, color chessboard.Color) bitboard.Board {
 }
 
 // isBitmaskUnderAttack checks if certain squares are under attacks from opponent
-func isBitmaskUnderAttack(board *chessboard.Board, color chessboard.Color, fields bitboard.Board) bool {
+func isBitmaskUnderAttack(board chessboard.Board, color chessboard.Color, fields bitboard.Board) bool {
 	switch {
 	case
 		RookAttacks(board, color)&fields != 0,
@@ -31,7 +31,7 @@ func isBitmaskUnderAttack(board *chessboard.Board, color chessboard.Color, field
 }
 
 // generatePseudoLegalMoves without checking legality of king check
-func generatePseudoLegalMoves(b *chessboard.Board) []Move {
+func generatePseudoLegalMoves(b chessboard.Board) []Move {
 	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
 	KnightMoves(b, &moves)
 	PawnMoves(b, &moves)
@@ -42,12 +42,12 @@ func generatePseudoLegalMoves(b *chessboard.Board) []Move {
 }
 
 // GenerateLegalMoves ...
-func GenerateLegalMoves(b *chessboard.Board) []Move {
+func GenerateLegalMoves(b chessboard.Board) []Move {
 	moves := generatePseudoLegalMoves(b)
 	legalMoves := make([]Move, 0, len(moves))
 
 	for _, m := range moves {
-		if isOpponentsKingNotUnderCheck(m.MakeMove(*b)) {
+		if isOpponentsKingNotUnderCheck(m.MakeMove(b)) {
 			legalMoves = append(legalMoves, m)
 		}
 	}
@@ -56,7 +56,7 @@ func GenerateLegalMoves(b *chessboard.Board) []Move {
 }
 
 // isOpponentsKingNotUnderCheck for checking legality of the move
-func isOpponentsKingNotUnderCheck(board *chessboard.Board) bool {
+func isOpponentsKingNotUnderCheck(board chessboard.Board) bool {
 	// check if opponent king is not under check by my pieces
 	king := board.Pieces[board.OpponentColor()][chessboard.King]
 

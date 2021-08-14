@@ -214,7 +214,7 @@ func oneBishopAttacks(sourceIndex int, allPieces bitboard.Board) bitboard.Board 
 	return bishopMoveA8H1Attacks[sourceIndex][stateIndexA8H1] | bishopMoveA1H8Attacks[sourceIndex][stateIndexA1H8]
 }
 
-func BishopAttacks(board *chessboard.Board, color chessboard.Color) bitboard.Board {
+func BishopAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
 	pieces := board.Pieces[color][chessboard.Bishop] | board.Pieces[color][chessboard.Queen]
 	attacks := bitboard.Empty
 
@@ -225,7 +225,7 @@ func BishopAttacks(board *chessboard.Board, color chessboard.Color) bitboard.Boa
 	return attacks
 }
 
-func BishopMoves(board *chessboard.Board, moves *[]Move) {
+func BishopMoves(board chessboard.Board, moves *[]Move) {
 	movingPiece := chessboard.Bishop
 	bishop := board.Pieces[board.NextMove][movingPiece]
 

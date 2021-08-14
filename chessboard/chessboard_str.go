@@ -11,7 +11,7 @@ import (
 
 // String representation of the board plane
 // Does not keep castling or enPassant info
-func (b *Board) String() string {
+func (b Board) String() string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString(bitboard.BoardHeader)
@@ -83,7 +83,7 @@ func (b *Board) String() string {
 
 // FromString representation of the board plane.
 // Does not keep castling or enPassant info
-func FromString(str string) *Board {
+func FromString(str string) Board {
 	fen := ""
 	reHeader := regexp.MustCompile("a b c d e f g h")
 	str = reHeader.ReplaceAllString(str, "")

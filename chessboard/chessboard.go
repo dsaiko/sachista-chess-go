@@ -23,12 +23,12 @@ type Board struct {
 }
 
 // Empty chessboard
-func Empty() *Board {
-	return &Board{FullMoveNumber: 1}
+func Empty() Board {
+	return Board{FullMoveNumber: 1}
 }
 
 // Standard chessboard layout
-func Standard() *Board {
+func Standard() Board {
 	b := Empty()
 	b.Pieces[White][Rook] = bitboard.A1 | bitboard.H1
 	b.Pieces[White][Knight] = bitboard.B1 | bitboard.G1
@@ -52,7 +52,7 @@ func Standard() *Board {
 }
 
 // BoardOfColor bitboard of all pieces of one color
-func (b *Board) BoardOfColor(color Color) bitboard.Board {
+func (b Board) BoardOfColor(color Color) bitboard.Board {
 	return b.Pieces[color][Queen] |
 		b.Pieces[color][King] |
 		b.Pieces[color][Rook] |
@@ -62,12 +62,12 @@ func (b *Board) BoardOfColor(color Color) bitboard.Board {
 }
 
 // BoardOfAllPieces bitboard of all pieces
-func (b *Board) BoardOfAllPieces() bitboard.Board {
+func (b Board) BoardOfAllPieces() bitboard.Board {
 	return b.BoardOfColor(White) | b.BoardOfColor(Black)
 }
 
 // OpponentColor ...
-func (b *Board) OpponentColor() Color {
+func (b Board) OpponentColor() Color {
 	if b.NextMove == White {
 		return Black
 	}
@@ -75,37 +75,37 @@ func (b *Board) OpponentColor() Color {
 }
 
 // BoardOfMyPieces ...
-func (b *Board) BoardOfMyPieces() bitboard.Board {
+func (b Board) BoardOfMyPieces() bitboard.Board {
 	return b.BoardOfColor(b.NextMove)
 }
 
 // BoardOfOpponentPieces ...
-func (b *Board) BoardOfOpponentPieces() bitboard.Board {
+func (b Board) BoardOfOpponentPieces() bitboard.Board {
 	return b.BoardOfColor(b.OpponentColor())
 }
 
 // BoardAvailableToAttack ..
-func (b *Board) BoardAvailableToAttack() bitboard.Board {
+func (b Board) BoardAvailableToAttack() bitboard.Board {
 	return ^b.BoardOfMyPieces()
 }
 
 // MyKingIndex ...
-func (b *Board) MyKingIndex() index.Index {
+func (b Board) MyKingIndex() index.Index {
 	return index.Index(b.Pieces[b.NextMove][King].BitScan())
 }
 
 // OpponentKingIndex ...
-func (b *Board) OpponentKingIndex() index.Index {
+func (b Board) OpponentKingIndex() index.Index {
 	return index.Index(b.Pieces[b.OpponentColor()][King].BitScan())
 }
 
 // RemoveCastling option from a side
-func (b *Board) RemoveCastling(color Color, castling Castling) {
+func (b Board) RemoveCastling(color Color, castling Castling) {
 	b.Castling[color] &= ^castling
 }
 
 // ComputeBoardHash hash
-func (b *Board) ComputeBoardHash() uint64 {
+func (b Board) ComputeBoardHash() uint64 {
 	hash := uint64(0)
 
 	if b.NextMove != White {

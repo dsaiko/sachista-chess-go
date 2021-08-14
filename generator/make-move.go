@@ -6,13 +6,13 @@ import (
 	"saiko.cz/sachista/index"
 )
 
-func (m *Move) MakeMove(board chessboard.Board) *chessboard.Board {
+func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 	sourceIndex := m.From
 	targetIndex := m.To
 
 	//TODO: test perf if removed
 	if sourceIndex == targetIndex {
-		return &board
+		return board
 	}
 
 	sourceBitBoard := bitboard.FromIndex1(sourceIndex)
@@ -158,7 +158,7 @@ func (m *Move) MakeMove(board chessboard.Board) *chessboard.Board {
 		board.ZobristHash ^= chessboard.ZobristKeys.EnPassant[board.EnPassantTarget]
 	}
 
-	return &board
+	return board
 }
 
 func absInt(x int) int {

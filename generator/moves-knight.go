@@ -24,7 +24,7 @@ func init() {
 	}
 }
 
-func KnightAttacks(board *chessboard.Board, color chessboard.Color) bitboard.Board {
+func KnightAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
 	pieces := board.Pieces[color][chessboard.Knight]
 	attacks := bitboard.Empty
 
@@ -36,7 +36,7 @@ func KnightAttacks(board *chessboard.Board, color chessboard.Color) bitboard.Boa
 }
 
 //TODO test with pointer to Board
-func KnightMoves(board *chessboard.Board, moves *[]Move) {
+func KnightMoves(board chessboard.Board, moves *[]Move) {
 	pieces := board.Pieces[board.NextMove][chessboard.Knight]
 
 	for pieces != bitboard.Empty {

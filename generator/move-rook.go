@@ -151,7 +151,7 @@ func oneRookAttacks(sourceIndex int, allPieces bitboard.Board) bitboard.Board {
 	return rookMoveRankAttacks[sourceIndex][stateIndexRank] | rookMoveFileAttacks[sourceIndex][stateIndexFile]
 }
 
-func RookAttacks(board *chessboard.Board, color chessboard.Color) bitboard.Board {
+func RookAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
 	pieces := board.Pieces[color][chessboard.Rook] | board.Pieces[color][chessboard.Queen]
 	attacks := bitboard.Empty
 
@@ -162,7 +162,7 @@ func RookAttacks(board *chessboard.Board, color chessboard.Color) bitboard.Board
 	return attacks
 }
 
-func RookMoves(board *chessboard.Board, moves *[]Move) {
+func RookMoves(board chessboard.Board, moves *[]Move) {
 	movingPiece := chessboard.Rook
 	rook := board.Pieces[board.NextMove][movingPiece]
 

@@ -56,7 +56,7 @@ func newCache(size uint64) *PerfTCache {
 }
 
 // perfT1 single threaded min/max algorithm for searching the moves
-func perfT1(cache *PerfTCache, b *chessboard.Board, depth int) uint64 {
+func perfT1(cache *PerfTCache, b chessboard.Board, depth int) uint64 {
 
 	// if found in cache
 	count := cache.get(b.ZobristHash, depth)
@@ -78,11 +78,11 @@ func perfT1(cache *PerfTCache, b *chessboard.Board, depth int) uint64 {
 		needToValidate := isKingMove || isCheck || sourceBitBoard&attacks != 0 || m.IsEnPassant
 
 		if depth == 1 {
-			if !needToValidate || isOpponentsKingNotUnderCheck(m.MakeMove(*b)) {
+			if !needToValidate || isOpponentsKingNotUnderCheck(m.MakeMove(b)) {
 				count++
 			}
 		} else {
-			nextBoard := m.MakeMove(*b)
+			nextBoard := m.MakeMove(b)
 			if !needToValidate || isOpponentsKingNotUnderCheck(nextBoard) {
 				count += perfT1(cache, nextBoard, depth-1)
 			}
@@ -98,7 +98,7 @@ func perfT1(cache *PerfTCache, b *chessboard.Board, depth int) uint64 {
 
 // PerfT multithreading perfT algorithm
 // goroutine are spawned on each of first set of legal moves
-func PerfT(b *chessboard.Board, depth int) uint64 {
+func PerfT(b chessboard.Board, depth int) uint64 {
 	if depth <= 0 {
 		return 1
 	}
@@ -115,10 +115,10 @@ func PerfT(b *chessboard.Board, depth int) uint64 {
 	// for each legal move, create a goroutine
 	for _, m := range moves {
 		wg.Add(1)
-		go func(b *chessboard.Board) {
+		go func(b chessboard.Board) {
 			defer wg.Done()
 			results <- perfT1(cache, b, depth-1)
-		}(m.MakeMove(*b))
+		}(m.MakeMove(b))
 	}
 
 	// wait for all and close results
