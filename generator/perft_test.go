@@ -1,7 +1,10 @@
 package generator
 
 import (
+	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 
 	"saiko.cz/sachista/chessboard"
 )
@@ -49,10 +52,10 @@ func TestPerfT(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		t.Run("", func(t *testing.T) {
-			if got := PerfT(tc.board, tc.depth); got != tc.want {
-				t.Errorf("PerfT() = %v, want %v", got, tc.want)
-			}
-		})
+		start := time.Now()
+		got := PerfT(tc.board, tc.depth)
+		duration := time.Since(start)
+		fmt.Printf("'%v': %v\n", tc.board.ToFEN(), duration)
+		assert.Equal(t, tc.want, got)
 	}
 }

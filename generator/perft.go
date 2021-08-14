@@ -1,7 +1,6 @@
 package generator
 
 import (
-	"fmt"
 	"sync"
 
 	"saiko.cz/sachista/bitboard"
@@ -45,32 +44,14 @@ func (c *PerfTCache) get(hash uint64, depth int) uint64 {
 	return 0
 }
 
-var cache PerfTCache
-
-func allocateCache() {
-	defer func() {
-		if r := recover(); r != nil {
-			cache.cacheSize /= 2
-			fmt.Println(r, "Memory initialization failed. Reducing Cache Size:", cache.cacheSize)
-			cache.entries = []PerfTCacheEntry{}
-		}
-	}()
+func newCache(size uint64) *PerfTCache {
+	var cache PerfTCache
+	cache.cacheSize = size
 	cache.entries = make([]PerfTCacheEntry, cache.cacheSize)
+	return &cache
 }
 
-func init() {
-	cache.cacheSize = 128 * 1024 * 1024
-	for len(cache.entries) == 0 {
-		allocateCache()
-		if len(cache.entries) == 0 {
-			if cache.cacheSize < 1024*1024 {
-				panic("Memory initialization error")
-			}
-		}
-	}
-}
-
-func perfT1(b *chessboard.Board, depth int) uint64 {
+func perfT1(cache *PerfTCache, b *chessboard.Board, depth int) uint64 {
 	count := cache.get(b.ZobristHash, depth)
 	if count != 0 {
 		return count
@@ -93,7 +74,7 @@ func perfT1(b *chessboard.Board, depth int) uint64 {
 				if depth == 1 {
 					count++
 				} else {
-					count += perfT1(nextBoard, depth-1)
+					count += perfT1(cache, nextBoard, depth-1)
 				}
 			}
 		} else {
@@ -102,7 +83,7 @@ func perfT1(b *chessboard.Board, depth int) uint64 {
 			} else {
 				// do not need to validate legality of the move
 				nextBoard := m.MakeMove(*b)
-				count += perfT1(nextBoard, depth-1)
+				count += perfT1(cache, nextBoard, depth-1)
 			}
 		}
 	}
@@ -124,16 +105,17 @@ func PerfT(b *chessboard.Board, depth int) uint64 {
 		return uint64(len(moves))
 	}
 
+	cache := newCache(16 * 1024 * 1024)
 	results := make(chan uint64, len(moves))
 	var wg sync.WaitGroup
 
 	for _, m := range moves {
 		wg.Add(1)
 		nextBoard := m.MakeMove(*b)
-		go func(b *chessboard.Board) {
+		go func(cache *PerfTCache, b *chessboard.Board) {
 			defer wg.Done()
-			results <- perfT1(b, depth-1)
-		}(nextBoard)
+			results <- perfT1(cache, b, depth-1)
+		}(cache, nextBoard)
 	}
 
 	wg.Wait()
