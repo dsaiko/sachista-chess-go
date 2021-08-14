@@ -70,7 +70,7 @@ func init() {
 	}
 }
 
-func PerfT(b *chessboard.Board, depth int) uint64 {
+func perfT1(b *chessboard.Board, depth int) uint64 {
 	count := cache.get(b.ZobristHash, depth)
 	if count != 0 {
 		return count
@@ -93,7 +93,7 @@ func PerfT(b *chessboard.Board, depth int) uint64 {
 				if depth == 1 {
 					count++
 				} else {
-					count += PerfT(nextBoard, depth-1)
+					count += perfT1(nextBoard, depth-1)
 				}
 			}
 		} else {
@@ -102,7 +102,7 @@ func PerfT(b *chessboard.Board, depth int) uint64 {
 			} else {
 				// do not need to validate legality of the move
 				nextBoard := m.MakeMove(*b)
-				count += PerfT(nextBoard, depth-1)
+				count += perfT1(nextBoard, depth-1)
 			}
 		}
 	}
@@ -111,5 +111,38 @@ func PerfT(b *chessboard.Board, depth int) uint64 {
 	// fmt.Printf("%v|%v|%v\n",b.ToFEN(), depth, count)
 
 	cache.set(b.ZobristHash, depth, count)
+	return count
+}
+
+func PerfT(b *chessboard.Board, depth int) uint64 {
+	if depth <= 0 {
+		return 1
+	}
+
+	moves := GenerateLegalMoves(b)
+	if depth == 1 {
+		return uint64(len(moves))
+	}
+
+	results := make(chan uint64, len(moves))
+	var wg sync.WaitGroup
+
+	for _, m := range moves {
+		wg.Add(1)
+		nextBoard := m.MakeMove(*b)
+		go func(b *chessboard.Board) {
+			defer wg.Done()
+			results <- perfT1(b, depth-1)
+		}(nextBoard)
+	}
+
+	wg.Wait()
+	close(results)
+
+	count := uint64(0)
+	for res := range results {
+		count += res
+	}
+
 	return count
 }
