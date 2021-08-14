@@ -100,7 +100,7 @@ func (b Board) OpponentKingIndex() index.Index {
 }
 
 // RemoveCastling option from a side
-func (b Board) RemoveCastling(color Color, castling Castling) {
+func (b *Board) RemoveCastling(color Color, castling Castling) {
 	b.Castling[color] &= ^castling
 }
 
