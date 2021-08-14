@@ -9,6 +9,9 @@ import (
 	"saiko.cz/sachista/index"
 )
 
+// Board is representing 8x8 (64 bit) bitboard where each bit represent existing piece on the given position
+type Board uint64
+
 // PopCount returns the number of bits set in the bitboard
 func (b Board) PopCount() int {
 	return bits.OnesCount64(uint64(b))
@@ -93,25 +96,27 @@ func (b Board) OneNorthWest() Board {
 }
 
 // Shift shifts all existing Board pieces by multiple steps
-//goland:noinspection GoAssignmentToReceiver
 func (b Board) Shift(dx int, dy int) Board {
-
-	//dy = up/down
+	// dy = up/down
 	if dy > 0 {
+		//goland:noinspection GoAssignmentToReceiver
 		b <<= dy * 8
 	}
 	if dy < 0 {
+		//goland:noinspection GoAssignmentToReceiver
 		b >>= (-dy) * 8
 	}
 
-	//dx = left / right
+	// dx = left / right
 	if dx > 0 {
 		for i := 0; i < dx; i++ {
+			//goland:noinspection GoAssignmentToReceiver
 			b = b.OneEast()
 		}
 	}
 	if dx < 0 {
 		for i := 0; i < -dx; i++ {
+			//goland:noinspection GoAssignmentToReceiver
 			b = b.OneWest()
 		}
 	}
@@ -190,12 +195,12 @@ func (b Board) String() string {
 	for i := 0; i < constants.NumberOfSquares; i++ {
 		if (i % 8) == 0 {
 			if i > 0 {
-				//print right column digit
+				// print right column digit
 				buffer.WriteString(strconv.Itoa(9 - (i / 8)))
 				buffer.WriteString("\n")
 			}
 
-			//print left column digit
+			// print left column digit
 			buffer.WriteString(strconv.Itoa(8 - (i / 8)))
 			buffer.WriteString(" ")
 		}
@@ -207,7 +212,7 @@ func (b Board) String() string {
 		}
 	}
 
-	buffer.WriteString("1\n") //last right column digit
+	buffer.WriteString("1\n") // last right column digit
 	buffer.WriteString(BoardHeader)
 
 	return buffer.String()

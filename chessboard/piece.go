@@ -1,5 +1,7 @@
 package chessboard
 
+import "strings"
+
 type Piece int
 
 // Piece index is used in ChessBoard.Pieces
@@ -15,68 +17,54 @@ const (
 
 // String representation of a piece for given color
 func (p Piece) String(color Color) string {
-	if color == White {
-		switch p {
-		case King:
-			return "K"
-		case Queen:
-			return "Q"
-		case Bishop:
-			return "B"
-		case Rook:
-			return "R"
-		case Knight:
-			return "N"
-		case Pawn:
-			return "P"
-		}
-	} else {
-		switch p {
-		case King:
-			return "k"
-		case Queen:
-			return "q"
-		case Bishop:
-			return "b"
-		case Rook:
-			return "r"
-		case Knight:
-			return "n"
-		case Pawn:
-			return "p"
-		}
+	c := "?"
+
+	switch p {
+	case King:
+		c = "K"
+	case Queen:
+		c = "Q"
+	case Bishop:
+		c = "B"
+	case Rook:
+		c = "R"
+	case Knight:
+		c = "N"
+	case Pawn:
+		c = "P"
 	}
-	return "?"
+
+	if color == Black {
+		c = strings.ToLower(c)
+	}
+
+	return c
 }
 
+// PieceFromNotation returns piece and color from a notation string like 'p' or 'P'
 func PieceFromNotation(c string) (Piece, Color) {
-	switch c {
-	case "K":
-		return King, White
-	case "Q":
-		return Queen, White
-	case "B":
-		return Bishop, White
-	case "R":
-		return Rook, White
-	case "N":
-		return Knight, White
-	case "P":
-		return Pawn, White
+	color := White
 
-	case "k":
-		return King, Black
-	case "q":
-		return Queen, Black
-	case "b":
-		return Bishop, Black
-	case "r":
-		return Rook, Black
-	case "n":
-		return Knight, Black
-	case "p":
-		return Pawn, Black
+	if strings.ToLower(c) == c {
+		color = Black
 	}
 
-	return NoPiece, White
+	c = strings.ToLower(c)
+
+	switch c {
+	case "k":
+		return King, color
+	case "q":
+		return Queen, color
+	case "b":
+		return Bishop, color
+	case "r":
+		return Rook, color
+	case "n":
+		return Knight, color
+	case "p":
+		return Pawn, color
+	}
+
+	return NoPiece, color
 }

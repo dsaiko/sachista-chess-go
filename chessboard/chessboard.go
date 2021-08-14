@@ -2,11 +2,25 @@ package chessboard
 
 import (
 	"saiko.cz/sachista/bitboard"
+	"saiko.cz/sachista/constants"
 	"saiko.cz/sachista/index"
 	"saiko.cz/sachista/zobrist"
 )
 
 var ZobristKeys = zobrist.NewZobristKeys()
+
+//goland:noinspection SpellCheckingInspection
+const StandardBoardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+type Board struct {
+	NextMove        Color
+	Castling        [constants.NumberOfColors]Castling
+	Pieces          [constants.NumberOfColors][constants.NumberOfPieces]bitboard.Board
+	HalfMoveClock   int
+	FullMoveNumber  int
+	EnPassantTarget index.Index
+	ZobristHash     uint64
+}
 
 // Empty chessboard
 func Empty() *Board {
@@ -33,7 +47,7 @@ func Standard() *Board {
 	b.Castling[White] = CastlingBothSides
 	b.Castling[Black] = CastlingBothSides
 
-	b.ZobristHash = b.ComputeZobrist()
+	b.ZobristHash = b.ComputeBoardHash()
 	return b
 }
 
@@ -90,35 +104,24 @@ func (b *Board) RemoveCastling(color Color, castling Castling) {
 	b.Castling[color] &= ^castling
 }
 
-func (c Color) String() string {
-	switch c {
-	case White:
-		return "w"
-	case Black:
-		return "b"
-	default:
-		return "?"
-	}
-}
-
-//TODO b vs *b perf
-func (b *Board) ComputeZobrist() uint64 {
+// ComputeBoardHash hash
+func (b *Board) ComputeBoardHash() uint64 {
 	hash := uint64(0)
 
 	if b.NextMove != White {
-		hash ^= ZobristKeys.RndSide
+		hash ^= ZobristKeys.Side
 	}
 
 	if b.Castling[White] != 0 {
-		hash ^= ZobristKeys.RndCastling[White][b.Castling[White]]
+		hash ^= ZobristKeys.Castling[White][b.Castling[White]]
 	}
 
 	if b.Castling[Black] != 0 {
-		hash ^= ZobristKeys.RndCastling[Black][b.Castling[Black]]
+		hash ^= ZobristKeys.Castling[Black][b.Castling[Black]]
 	}
 
 	if b.EnPassantTarget != 0 {
-		hash ^= ZobristKeys.RndEnPassant[b.EnPassantTarget]
+		hash ^= ZobristKeys.EnPassant[b.EnPassantTarget]
 	}
 
 	for color := 0; color < 2; color++ {
@@ -126,7 +129,7 @@ func (b *Board) ComputeZobrist() uint64 {
 			pieces := b.Pieces[color][piece]
 
 			for pieces > 0 {
-				hash ^= ZobristKeys.RndPieces[color][piece][pieces.BitPop()]
+				hash ^= ZobristKeys.Pieces[color][piece][pieces.BitPop()]
 			}
 		}
 	}

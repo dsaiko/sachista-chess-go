@@ -2,9 +2,6 @@ package bitboard
 
 const BoardHeader = "  a b c d e f g h\n"
 
-// Board is representing 8x8 (64 bit) bitboard where each bit represent existing piece on the given position
-type Board uint64
-
 // Constants for Board of single piece on the bitboard
 const (
 	A1 Board = 1

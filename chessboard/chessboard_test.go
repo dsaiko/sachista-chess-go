@@ -41,10 +41,10 @@ func TestBoard_UpdateZobrist(t *testing.T) {
 	//no halfmove counters are relevant
 	b2.HalfMoveClock = 99
 	b2.FullMoveNumber = 99
-	b2.ZobristHash = b2.ComputeZobrist()
+	b2.ZobristHash = b2.ComputeBoardHash()
 	assert.Equal(t, b1.ZobristHash, b2.ZobristHash)
 
 	b2.Pieces[White][Pawn] |= bitboard.A3
-	b2.ZobristHash = b2.ComputeZobrist()
+	b2.ZobristHash = b2.ComputeBoardHash()
 	assert.NotEqual(t, b1.ZobristHash, b2.ZobristHash)
 }

@@ -57,7 +57,7 @@ func TestStandardBoard(t *testing.T) {
 	hash = b.ZobristHash
 	assert.Zero(t, hash)
 
-	b.ZobristHash = b.ComputeZobrist()
+	b.ZobristHash = b.ComputeBoardHash()
 	assert.Zero(t, b.ZobristHash)
 }
 
@@ -73,7 +73,7 @@ func TestFromString(t *testing.T) {
 	assert.NotEqual(t, b, b2)
 	assert.NotEqual(t, b.ZobristHash, b2.ZobristHash)
 	b2.EnPassantTarget = index.A2
-	b2.ZobristHash = b2.ComputeZobrist()
+	b2.ZobristHash = b2.ComputeBoardHash()
 	assert.Equal(t, b, b2)
 	assert.Equal(t, b.ZobristHash, b2.ZobristHash)
 }

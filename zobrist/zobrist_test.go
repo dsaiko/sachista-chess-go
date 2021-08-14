@@ -22,7 +22,7 @@ func TestNewZobrist(t *testing.T) {
 		set[r] = true
 	}
 
-	for _, v1 := range z.RndPieces {
+	for _, v1 := range z.Pieces {
 		for _, v2 := range v1 {
 			for _, v3 := range v2 {
 				check(v3)
@@ -30,15 +30,15 @@ func TestNewZobrist(t *testing.T) {
 		}
 	}
 
-	for _, v1 := range z.RndCastling {
+	for _, v1 := range z.Castling {
 		for _, v2 := range v1 {
 			check(v2)
 		}
 	}
 
-	for _, v1 := range z.RndEnPassant {
+	for _, v1 := range z.EnPassant {
 		check(v1)
 	}
 
-	check(z.RndSide)
+	check(z.Side)
 }

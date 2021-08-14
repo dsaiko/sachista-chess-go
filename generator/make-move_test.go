@@ -98,7 +98,7 @@ func TestZobristFailScenarion1(t *testing.T) {
 
 	board2 := move.MakeMove(*board)
 
-	assert.Equal(t, board2.ZobristHash, board2.ComputeZobrist())
+	assert.Equal(t, board2.ZobristHash, board2.ComputeBoardHash())
 }
 
 func TestZobrist(t *testing.T) {
@@ -109,5 +109,5 @@ func TestZobrist(t *testing.T) {
 		board = moves[0].MakeMove(*board)
 	}
 
-	assert.Equal(t, board.ZobristHash, board.ComputeZobrist())
+	assert.Equal(t, board.ZobristHash, board.ComputeBoardHash())
 }

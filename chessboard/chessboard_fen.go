@@ -279,6 +279,6 @@ func FromFen(fen string) *Board {
 		b.Castling[Black] = CastlingNone
 	}
 
-	b.ZobristHash = b.ComputeZobrist()
+	b.ZobristHash = b.ComputeBoardHash()
 	return b
 }
