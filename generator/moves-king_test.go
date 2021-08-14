@@ -41,5 +41,4 @@ func TestKingMoves(t *testing.T) {
 1 R - - - K - - R 1
  a b c d e f g h
 `)
-
 }

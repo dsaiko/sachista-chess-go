@@ -37,7 +37,7 @@ func init() {
 	}
 }
 
-func KingAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
+func kingAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
 	king := board.Pieces[color][chessboard.King]
 	if king == bitboard.Empty {
 		return bitboard.Empty
@@ -55,14 +55,13 @@ func KingMoves(board chessboard.Board, moves *[]Move) {
 	kingIndex := index.Index(king.BitScan())
 	movesBoard := kingMovesCache[kingIndex] & board.BoardAvailableToAttack()
 
-	//for all moves
+	// for all moves
 	for movesBoard != bitboard.Empty {
-
 		toIndex := movesBoard.BitPop()
 		*moves = append(*moves, Move{Piece: chessboard.King, From: kingIndex, To: index.Index(toIndex)})
 	}
 
-	//check castling options
+	// check castling options
 	if board.Castling[board.NextMove] == chessboard.CastlingNone {
 		return
 	}
@@ -70,31 +69,30 @@ func KingMoves(board chessboard.Board, moves *[]Move) {
 	allPieces := board.BoardOfAllPieces()
 
 	if board.NextMove == chessboard.White {
-		//if castling available
+		// if castling available
 		if (board.Castling[chessboard.White]&chessboard.CastlingKingSide != 0) && (allPieces&WhiteCastleOOEmpty == 0) {
 			if !isBitmaskUnderAttack(board, chessboard.Black, WhiteCastleOOAttacks) {
-				//add short castling move
+				// add short castling move
 				*moves = append(*moves, Move{Piece: chessboard.King, From: kingIndex, To: index.G1})
 			}
 		}
 		if (board.Castling[chessboard.White]&chessboard.CastlingQueenSide != 0) && (allPieces&WhiteCastleOOOEmpty == 0) {
 			if !isBitmaskUnderAttack(board, chessboard.Black, WhiteCastleOOOAttacks) {
-				//add long castling move
+				// add long castling move
 				*moves = append(*moves, Move{Piece: chessboard.King, From: kingIndex, To: index.C1})
 			}
 		}
-
 	} else {
-		//if castling available
+		// if castling available
 		if (board.Castling[chessboard.Black]&chessboard.CastlingKingSide != 0) && (allPieces&BlackCastleOOEmpty == 0) {
 			if !isBitmaskUnderAttack(board, chessboard.White, BlackCastleOOAttacks) {
-				//add short castling move
+				// add short castling move
 				*moves = append(*moves, Move{Piece: chessboard.King, From: kingIndex, To: index.G8})
 			}
 		}
 		if (board.Castling[chessboard.Black]&chessboard.CastlingQueenSide != 0) && (allPieces&BlackCastleOOOEmpty == 0) {
 			if !isBitmaskUnderAttack(board, chessboard.White, BlackCastleOOOAttacks) {
-				//add long castling move
+				// add long castling move
 				*moves = append(*moves, Move{Piece: chessboard.King, From: kingIndex, To: index.C8})
 			}
 		}

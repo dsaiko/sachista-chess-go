@@ -36,7 +36,6 @@ func TestFromIndex(t *testing.T) {
 		"B8", "C8", "D8", "E8", "F8", "G8",
 	)
 	assert.Equal(t, Frame, b)
-
 }
 
 func TestFromIndex1(t *testing.T) {

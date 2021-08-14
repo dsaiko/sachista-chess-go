@@ -22,7 +22,7 @@ func (m Move) String() string {
 	buffer.WriteString(m.From.String())
 	buffer.WriteString(m.To.String())
 
-	if m.PromotionPiece > 0 { //this excludes NoPiece and King
+	if m.PromotionPiece > 0 { // this excludes NoPiece and King
 		buffer.WriteString(m.PromotionPiece.String(chessboard.Black))
 	}
 

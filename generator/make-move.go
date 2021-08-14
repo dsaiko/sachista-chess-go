@@ -18,7 +18,7 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 	targetBitBoard := bitboard.FromIndex1(targetIndex)
 	opponentColor := board.OpponentColor()
 
-	board.HalfMoveClock += 1
+	board.HalfMoveClock++
 
 	// reset enPassant
 	if board.EnPassantTarget != 0 {
@@ -39,8 +39,8 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 	board.Pieces[board.NextMove][m.Piece] ^= sourceBitBoard | targetBitBoard
 	board.ZobristHash ^= chessboard.ZobristKeys.Pieces[board.NextMove][m.Piece][sourceIndex] ^ chessboard.ZobristKeys.Pieces[board.NextMove][m.Piece][targetIndex]
 
-	if m.Piece == chessboard.Rook {
-		// check castling
+	switch {
+	case m.Piece == chessboard.Rook:
 		if board.NextMove == chessboard.White {
 			if sourceIndex == index.A1 {
 				board.Castling[board.NextMove] &= ^chessboard.CastlingQueenSide
@@ -54,13 +54,11 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 				board.RemoveCastling(board.NextMove, chessboard.CastlingKingSide)
 			}
 		}
-	} else if m.Piece == chessboard.King {
-		// check castling
+	case m.Piece == chessboard.King:
 		board.Castling[board.NextMove] = chessboard.CastlingNone
-
 		if board.NextMove == chessboard.White {
 			if sourceIndex == index.E1 {
-				//handle castling
+				// handle castling
 				if targetIndex == index.C1 {
 					board.Pieces[board.NextMove][chessboard.Rook] ^= bitboard.A1 | bitboard.D1
 					board.ZobristHash ^= chessboard.ZobristKeys.Pieces[board.NextMove][chessboard.Rook][index.A1] ^ chessboard.ZobristKeys.Pieces[board.NextMove][chessboard.Rook][index.D1]
@@ -71,7 +69,7 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 			}
 		} else {
 			if sourceIndex == index.E8 {
-				//handle castling
+				// handle castling
 				if targetIndex == index.C8 {
 					board.Pieces[board.NextMove][chessboard.Rook] ^= bitboard.A8 | bitboard.D8
 					board.ZobristHash ^= chessboard.ZobristKeys.Pieces[board.NextMove][chessboard.Rook][index.A8] ^ chessboard.ZobristKeys.Pieces[board.NextMove][chessboard.Rook][index.D8]
@@ -81,10 +79,8 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 				}
 			}
 		}
-	} else if m.Piece == chessboard.Pawn {
+	case m.Piece == chessboard.Pawn:
 		board.HalfMoveClock = 0
-
-		// initial pawn double move
 		if absInt(int(targetIndex)-int(sourceIndex)) > 10 {
 			var n index.Index = 8
 			if board.NextMove == chessboard.Black {
@@ -145,11 +141,10 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 	}
 
 	if board.NextMove == chessboard.Black {
-		board.FullMoveNumber += 1
+		board.FullMoveNumber++
 	}
 
 	// update Zobrist
-
 	board.NextMove = opponentColor
 	board.ZobristHash ^= chessboard.ZobristKeys.Side
 

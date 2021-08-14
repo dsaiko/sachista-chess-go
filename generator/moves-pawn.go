@@ -25,15 +25,14 @@ func init() {
 	}
 }
 
-func PawnAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
+func pawnAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
 	if color == chessboard.White {
 		return board.Pieces[color][chessboard.Pawn].OneNorthEast() | board.Pieces[color][chessboard.Pawn].OneNorthWest()
-	} else {
-		return board.Pieces[color][chessboard.Pawn].OneSouthEast() | board.Pieces[color][chessboard.Pawn].OneSouthWest()
 	}
+	return board.Pieces[color][chessboard.Pawn].OneSouthEast() | board.Pieces[color][chessboard.Pawn].OneSouthWest()
 }
 
-func PawnMoves(board chessboard.Board, moves *[]Move) {
+func pawnMoves(board chessboard.Board, moves *[]Move) {
 	emptyBoard := ^board.BoardOfAllPieces()
 
 	whiteBaseRank := 16
@@ -53,39 +52,39 @@ func PawnMoves(board chessboard.Board, moves *[]Move) {
 	for pawns != bitboard.Empty {
 		sourceIndex := pawns.BitPop()
 
-		//get possible moves - moves minus my onw color
-		//one step forward
+		// get possible moves - moves minus my onw color
+		// one step forward
 		movesBoard := pawnMovesCache[board.NextMove][sourceIndex] & emptyBoard
 
-		//if one step forward was successful and we are on base rank, try double move
+		// if one step forward was successful, and we are on base rank, try double move
 		if movesBoard != emptyBoard && sourceIndex < whiteBaseRank {
 			movesBoard |= movesBoard.OneNorth() & emptyBoard
 		} else if movesBoard != emptyBoard && sourceIndex > blackBaseRank {
 			movesBoard |= movesBoard.OneSouth() & emptyBoard
 		}
 
-		//get attacks, only against opponent pieces
+		// get attacks, only against opponent pieces
 		attacks := pawnAttacksCache[board.NextMove][sourceIndex]
 		movesBoard |= attacks & board.BoardOfOpponentPieces()
 
-		//for all moves
+		// for all moves
 		for movesBoard != bitboard.Empty {
-			//get next move
+			// get next move
 			targetIndex := movesBoard.BitPop()
 
-			//promotion?
+			// promotion?
 			if targetIndex > whitePromotionRank || targetIndex < blackPromotionRank {
 				*moves = append(*moves, Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Bishop})
 				*moves = append(*moves, Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Knight})
 				*moves = append(*moves, Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Queen})
 				*moves = append(*moves, Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex), PromotionPiece: chessboard.Rook})
 			} else {
-				//normal move/capture
+				// normal move/capture
 				*moves = append(*moves, Move{Piece: chessboard.Pawn, From: index.Index(sourceIndex), To: index.Index(targetIndex)})
 			}
 		}
 
-		//check enpassant capture
+		// check enpassant capture
 		if board.EnPassantTarget != 0 {
 			movesBoard = attacks & bitboard.FromIndex1(board.EnPassantTarget)
 			if movesBoard != bitboard.Empty {
@@ -94,5 +93,4 @@ func PawnMoves(board chessboard.Board, moves *[]Move) {
 			}
 		}
 	}
-
 }

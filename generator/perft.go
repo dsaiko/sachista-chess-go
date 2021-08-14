@@ -50,7 +50,6 @@ func newCache(size uint64) *PerfTCache {
 
 // perfT1 single threaded min/max algorithm for searching the moves
 func perfT1(cache *PerfTCache, b chessboard.Board, depth int) uint64 {
-
 	// if found in cache
 	count := cache.get(b.ZobristHash, depth)
 	if count != 0 {

@@ -135,7 +135,7 @@ func FromFEN(fen string) Board {
 		}
 
 		if c == '/' {
-			//nothing
+			// nothing
 			continue
 		}
 
@@ -180,7 +180,7 @@ func FromFEN(fen string) Board {
 	}
 
 	// next move
-	i++ //skip space
+	i++ // skip space
 	if i < fenLength {
 		if fen[i] == 'w' {
 			b.NextMove = White

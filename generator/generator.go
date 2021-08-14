@@ -8,22 +8,22 @@ import (
 
 // attacks of all pieces
 func attacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
-	return KnightAttacks(board, color) |
-		PawnAttacks(board, color) |
-		KingAttacks(board, color) |
-		RookAttacks(board, color) |
-		BishopAttacks(board, color)
+	return knightAttacks(board, color) |
+		pawnAttacks(board, color) |
+		kingAttacks(board, color) |
+		rookAttacks(board, color) |
+		bishopAttacks(board, color)
 }
 
 // isBitmaskUnderAttack checks if certain squares are under attacks from opponent
 func isBitmaskUnderAttack(board chessboard.Board, color chessboard.Color, fields bitboard.Board) bool {
 	switch {
 	case
-		RookAttacks(board, color)&fields != 0,
-		BishopAttacks(board, color)&fields != 0,
-		KnightAttacks(board, color)&fields != 0,
-		PawnAttacks(board, color)&fields != 0,
-		KingAttacks(board, color)&fields != 0:
+		rookAttacks(board, color)&fields != 0,
+		bishopAttacks(board, color)&fields != 0,
+		knightAttacks(board, color)&fields != 0,
+		pawnAttacks(board, color)&fields != 0,
+		kingAttacks(board, color)&fields != 0:
 		return true
 	default:
 		return false
@@ -34,7 +34,7 @@ func isBitmaskUnderAttack(board chessboard.Board, color chessboard.Color, fields
 func generatePseudoLegalMoves(b chessboard.Board) []Move {
 	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
 	KnightMoves(b, &moves)
-	PawnMoves(b, &moves)
+	pawnMoves(b, &moves)
 	KingMoves(b, &moves)
 	RookMoves(b, &moves)
 	BishopMoves(b, &moves)

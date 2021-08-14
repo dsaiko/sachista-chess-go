@@ -84,7 +84,7 @@ func (b Board) BoardOfOpponentPieces() bitboard.Board {
 	return b.BoardOfColor(b.OpponentColor())
 }
 
-// BoardAvailableToAttack ..
+// BoardAvailableToAttack ...
 func (b Board) BoardAvailableToAttack() bitboard.Board {
 	return ^b.BoardOfMyPieces()
 }

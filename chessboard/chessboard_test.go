@@ -38,7 +38,7 @@ func TestBoard_UpdateZobrist(t *testing.T) {
 
 	assert.Equal(t, b1.ZobristHash, b2.ZobristHash)
 
-	//no halfmove counters are relevant
+	// no halfmove counters are relevant
 	b2.HalfMoveClock = 99
 	b2.FullMoveNumber = 99
 	b2.ZobristHash = b2.ComputeBoardHash()

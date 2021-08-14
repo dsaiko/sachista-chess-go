@@ -16,7 +16,7 @@ func TestNewZobrist(t *testing.T) {
 	check := func(r uint64) {
 		assert.NotZero(t, r)
 		if _, ok := set[r]; ok {
-			//key already exists !?
+			// key already exists !?
 			assert.Fail(t, "Non unique zobrist random number detected!")
 		}
 		set[r] = true
