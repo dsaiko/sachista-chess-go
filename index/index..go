@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+type Index int
+
 // FileIndex return index of File (column) of the piece
 func (i Index) FileIndex() int {
 	return int(i) % 8

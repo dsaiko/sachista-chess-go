@@ -24,7 +24,7 @@ func testMovesFromString(t *testing.T, expectedCount int, stringBoard string) {
 }
 
 func testMovesFromFEN(t *testing.T, expectedCount int, fen string) {
-	board := chessboard.FromFen(fen)
+	board := chessboard.FromFEN(fen)
 	moves := GeneratePseudoLegalMoves(board)
 	assert.Equal(t, expectedCount, len(moves))
 }

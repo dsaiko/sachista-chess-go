@@ -7,7 +7,7 @@ import (
 	"saiko.cz/sachista/zobrist"
 )
 
-var ZobristKeys = zobrist.NewZobristKeys()
+var ZobristKeys = zobrist.NewKeys()
 
 //goland:noinspection SpellCheckingInspection
 const StandardBoardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"

@@ -17,20 +17,24 @@ package zobrist
 /// PRNG Inspired by Stockfish GPL source code
 
 import (
-	"math/rand"
+	"crypto/rand"
+	"encoding/binary"
 
 	"saiko.cz/sachista/constants"
 )
 
-type ZobristKeys struct {
+// Keys for Zobrist checksum of the board
+// Hash does not include move clocks
+type Keys struct {
 	Pieces    [constants.NumberOfColors][constants.NumberOfPieces + 1][constants.NumberOfSquares]uint64
 	Castling  [constants.NumberOfColors][constants.NumberOfCastlingOptions]uint64
 	EnPassant [constants.NumberOfSquares]uint64
 	Side      uint64
 }
 
-func NewZobristKeys() *ZobristKeys {
-	z := &ZobristKeys{}
+// NewKeys initializes new random number keys
+func NewKeys() *Keys {
+	z := &Keys{}
 
 	// Generate random values for all unique states
 	// We do not need to seed the generator, numbers may be the same each time
@@ -38,17 +42,27 @@ func NewZobristKeys() *ZobristKeys {
 	for square := 0; square < constants.NumberOfSquares; square++ {
 		for side := 0; side < constants.NumberOfColors; side++ {
 			for piece := 0; piece < constants.NumberOfPieces+1; piece++ {
-				z.Pieces[side][piece][square] = rand.Uint64()
+				z.Pieces[side][piece][square] = randUInt64()
 			}
 		}
-		z.EnPassant[square] = rand.Uint64()
+		z.EnPassant[square] = randUInt64()
 	}
 
 	for i := 0; i < 4; i++ {
-		z.Castling[0][i] = rand.Uint64()
-		z.Castling[1][i] = rand.Uint64()
+		z.Castling[0][i] = randUInt64()
+		z.Castling[1][i] = randUInt64()
 	}
 
-	z.Side = rand.Uint64()
+	z.Side = randUInt64()
 	return z
+}
+
+// randUInt64 generate random number
+// https://stackoverflow.com/questions/44482738/random-64-bit-integer-from-crypto-rand
+func randUInt64() uint64 {
+	var b [8]byte
+	if _, err := rand.Read(b[:]); err != nil {
+		panic(err)
+	}
+	return binary.LittleEndian.Uint64(b[:])
 }

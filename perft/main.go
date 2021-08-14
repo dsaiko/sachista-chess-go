@@ -10,7 +10,7 @@ import (
 //TODO try release build
 //TODO create parametric main function
 func main() {
-	board := chessboard.FromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+	board := chessboard.FromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
 	depth := 7
 	want := 3_195_901_860
 

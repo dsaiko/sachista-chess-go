@@ -93,7 +93,7 @@ func TestMove_MakeMove(t *testing.T) {
 }
 
 func TestZobristFailScenarion1(t *testing.T) {
-	board := chessboard.FromFen("r4rk1/p2pqpb1/bn2pnp1/2pP4/1p2P3/3N1Q1p/PPPBBPPP/RN2K2R w KQ c6 0 3")
+	board := chessboard.FromFEN("r4rk1/p2pqpb1/bn2pnp1/2pP4/1p2P3/3N1Q1p/PPPBBPPP/RN2K2R w KQ c6 0 3")
 	move := Move{Piece: chessboard.King, From: index.E1, To: index.G1, IsEnPassant: false}
 
 	board2 := move.MakeMove(*board)
@@ -102,7 +102,7 @@ func TestZobristFailScenarion1(t *testing.T) {
 }
 
 func TestZobrist(t *testing.T) {
-	board := chessboard.FromFen("r4rk1/p2pqpb1/bn2pnp1/2pP4/1p2P3/3N1Q1p/PPPBBPPP/RN2K2R w KQ c6 0 3")
+	board := chessboard.FromFEN("r4rk1/p2pqpb1/bn2pnp1/2pP4/1p2P3/3N1Q1p/PPPBBPPP/RN2K2R w KQ c6 0 3")
 
 	for i := 0; i < 1000; i++ {
 		moves := GenerateLegalMoves(board)

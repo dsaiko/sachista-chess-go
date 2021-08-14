@@ -62,10 +62,10 @@ func TestStandardBoard(t *testing.T) {
 }
 
 func TestFromString(t *testing.T) {
-	b := FromFen("8/1K6/1Q6/8/5r2/4rk2/8/8 w - a2")
+	b := FromFEN("8/1K6/1Q6/8/5r2/4rk2/8/8 w - a2")
 	assert.Equal(t, index.A2, b.EnPassantTarget)
 
-	b2 := FromFen(b.ToFEN())
+	b2 := FromFEN(b.ToFEN())
 	assert.Equal(t, b, b2)
 	assert.Equal(t, b.ZobristHash, b2.ZobristHash)
 

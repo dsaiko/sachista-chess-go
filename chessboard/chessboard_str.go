@@ -9,6 +9,8 @@ import (
 	"saiko.cz/sachista/constants"
 )
 
+// String representation of the board plane
+// Does not keep castling or enPassant info
 func (b *Board) String() string {
 	var buffer bytes.Buffer
 
@@ -79,12 +81,14 @@ func (b *Board) String() string {
 	return buffer.String()
 }
 
+// FromString representation of the board plane.
+// Does not keep castling or enPassant info
 func FromString(str string) *Board {
 	fen := ""
 	reHeader := regexp.MustCompile("a b c d e f g h")
 	str = reHeader.ReplaceAllString(str, "")
 
-	//create FEN string from board pieces
+	// create FEN string from board pieces
 	for _, c := range str {
 		piece, _ := PieceFromNotation(string(byte(c)))
 		if piece != NoPiece {
@@ -100,5 +104,5 @@ func FromString(str string) *Board {
 	}
 	fen += " w KQkq - 0 1"
 
-	return FromFen(fen)
+	return FromFEN(fen)
 }

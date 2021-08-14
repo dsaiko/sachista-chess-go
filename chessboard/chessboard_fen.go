@@ -9,6 +9,7 @@ import (
 	"saiko.cz/sachista/index"
 )
 
+// ToFEN converts board to FEN notation string
 func (b *Board) ToFEN() string {
 
 	var buffer bytes.Buffer
@@ -82,12 +83,12 @@ func (b *Board) ToFEN() string {
 	}
 	outputCount()
 
-	//next move color
+	// next move color
 	buffer.WriteString(" ")
 	buffer.WriteString(b.NextMove.String())
 	buffer.WriteString(" ")
 
-	//Castling
+	// Castling
 	if b.Castling[White]&CastlingKingSide != 0 {
 		buffer.WriteString(King.String(White))
 	}
@@ -104,7 +105,7 @@ func (b *Board) ToFEN() string {
 		buffer.WriteString("-")
 	}
 
-	//enPassant
+	// enPassant
 	buffer.WriteString(" ")
 	if b.EnPassantTarget != 0 {
 		buffer.WriteString(b.EnPassantTarget.String())
@@ -112,7 +113,7 @@ func (b *Board) ToFEN() string {
 		buffer.WriteString("-")
 	}
 
-	//move number
+	// move number
 	buffer.WriteString(" ")
 	buffer.WriteString(strconv.Itoa(b.HalfMoveClock))
 	buffer.WriteString(" ")
@@ -121,7 +122,8 @@ func (b *Board) ToFEN() string {
 	return buffer.String()
 }
 
-func FromFen(fen string) *Board {
+// FromFEN converts FEN string to board object
+func FromFEN(fen string) *Board {
 	b := Empty()
 	i := 0
 	fenLength := len(fen)
@@ -140,14 +142,14 @@ func FromFen(fen string) *Board {
 		if c >= '0' && c <= '9' {
 			n := c - '0'
 
-			//output number of empty fields
+			// output number of empty fields
 			for color := White; color <= Black; color++ {
 				for piece := King; piece <= Pawn; piece++ {
 					b.Pieces[color][piece] <<= n
 				}
 			}
 		} else {
-			//output a piece
+			// output a piece
 			b.Pieces[White][King] <<= 1
 			b.Pieces[White][Queen] <<= 1
 			b.Pieces[White][Rook] <<= 1
@@ -162,7 +164,7 @@ func FromFen(fen string) *Board {
 			b.Pieces[Black][Bishop] <<= 1
 			b.Pieces[Black][Pawn] <<= 1
 
-			//set the new piece
+			// set the new piece
 			piece, color := PieceFromNotation(string(c))
 			if piece != NoPiece {
 				b.Pieces[color][piece] |= 1
@@ -170,14 +172,14 @@ func FromFen(fen string) *Board {
 		}
 	}
 
-	//need to mirror the boards
+	// need to mirror the boards
 	for color := White; color <= Black; color++ {
 		for piece := King; piece <= Pawn; piece++ {
 			b.Pieces[color][piece] = b.Pieces[color][piece].MirrorHorizontal()
 		}
 	}
 
-	//next move
+	// next move
 	i++ //skip space
 	if i < fenLength {
 		if fen[i] == 'w' {
@@ -188,8 +190,8 @@ func FromFen(fen string) *Board {
 		i++
 	}
 
-	//castling
-	i++ //skip space
+	// castling
+	i++ // skip space
 	for ; i < fenLength; i++ {
 		c := fen[i]
 		if c == ' ' {
@@ -206,8 +208,8 @@ func FromFen(fen string) *Board {
 		b.Castling[color] |= castling
 	}
 
-	//enPassant
-	i++ //skip space
+	// enPassant
+	i++ // skip space
 	notation := ""
 	for ; i < fenLength; i++ {
 		c := fen[i]
@@ -224,8 +226,8 @@ func FromFen(fen string) *Board {
 		}
 	}
 
-	//half move clock
-	i++ //skip space
+	// half move clock
+	i++ // skip space
 	n := 0
 	for ; i < fenLength; i++ {
 		c := fen[i]
@@ -241,7 +243,7 @@ func FromFen(fen string) *Board {
 		b.HalfMoveClock = n
 	}
 
-	i++ //skip space
+	i++ // skip space
 	n = 0
 	for ; i < fenLength; i++ {
 		c := fen[i]
@@ -257,7 +259,7 @@ func FromFen(fen string) *Board {
 		b.FullMoveNumber = n
 	}
 
-	//fix castling
+	// fix castling
 	if (b.Pieces[White][Rook] & bitboard.A1) == 0 {
 		b.RemoveCastling(White, CastlingQueenSide)
 	}
@@ -271,7 +273,7 @@ func FromFen(fen string) *Board {
 		b.RemoveCastling(Black, CastlingKingSide)
 	}
 
-	//if king is misplaced, remove castling availability
+	// if king is misplaced, remove castling availability
 	if (b.Pieces[White][King] & bitboard.E1) == 0 {
 		b.Castling[White] = CastlingNone
 	}
