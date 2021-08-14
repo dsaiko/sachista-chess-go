@@ -35,7 +35,6 @@ func KnightAttacks(board chessboard.Board, color chessboard.Color) bitboard.Boar
 	return attacks
 }
 
-//TODO test with pointer to Board
 func KnightMoves(board chessboard.Board, moves *[]Move) {
 	pieces := board.Pieces[board.NextMove][chessboard.Knight]
 
@@ -45,7 +44,6 @@ func KnightMoves(board chessboard.Board, moves *[]Move) {
 
 		for target != bitboard.Empty {
 			targetIndex := target.BitPop()
-			//TODO: optimize?
 			*moves = append(*moves, Move{Piece: chessboard.Knight, From: index.Index(sourceIndex), To: index.Index(targetIndex)})
 		}
 	}

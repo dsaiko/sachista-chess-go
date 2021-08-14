@@ -37,7 +37,6 @@ func init() {
 	}
 }
 
-//TODO test *
 func KingAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
 	king := board.Pieces[color][chessboard.King]
 	if king == bitboard.Empty {
@@ -99,5 +98,4 @@ func KingMoves(board chessboard.Board, moves *[]Move) {
 			}
 		}
 	}
-
 }

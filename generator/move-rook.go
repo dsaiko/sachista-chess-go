@@ -92,62 +92,62 @@ func init() {
 		}
 	}
 
-	//precompute file moves
-	//for all pieces
+	// precompute file moves
+	// for all pieces
 	for i := 0; i < constants.NumberOfSquares; i++ {
 		fileIndex := index.Index(i).FileIndex()
 
 		//for all occupancy states
 		for n := 0; n < constants.NumberOfSquares; n++ {
 
-			//reconstuct the occupancy into file
+			// reconstruct the occupancy into file
 			board := bitboard.Board(n).Shift(1, 0).MirrorHorizontal().FlipA1H8().Shift(fileIndex, 0)
 
-			//generate available moves
+			// generate available moves
 			moves := bitboard.Empty
 
-			//set piece back in Ith position
+			// set piece back in Ith position
 			piece := bitboard.FromIndex1(index.Index(i))
 
-			//move piece in one direction
+			// move piece in one direction
 			for piece != bitboard.Empty {
 				piece = piece.OneNorth()
 
 				moves |= piece
 
-				//end when there is another piece on the board (either color, own color will have to be stripped out)
+				// end when there is another piece on the board (either color, own color will have to be stripped out)
 				if (piece & board) != 0 {
 					break
 				}
 			}
 
-			//set piece back to original Ith index
+			// set piece back to original Ith index
 			piece = bitboard.FromIndex1(index.Index(i))
 
-			//move piece in other direction
+			// move piece in other direction
 			for piece != bitboard.Empty {
 				piece = piece.OneSouth()
 
 				moves |= piece
 
-				//end when there is another piece on the board (either color, own color will have to be stripped out)
+				// end when there is another piece on the board (either color, own color will have to be stripped out)
 				if (piece & board) != 0 {
 					break
 				}
 			}
 
-			//remember file attacks
+			// remember file attacks
 			rookMoveFileAttacks[i][n] = moves
 		}
 	}
 }
 
 func oneRookAttacks(sourceIndex int, allPieces bitboard.Board) bitboard.Board {
-	//use magic multipliers to get occupancy state index
+	// use magic multipliers to get occupancy state index
 	stateIndexRank := (allPieces & rookMoveRankMask[sourceIndex]) >> rookMoveRankShift[sourceIndex]
 	stateIndexFile := ((allPieces & rookMoveFileMask[sourceIndex]) * rookMoveFileMagic[sourceIndex]) >> 57
 
-	//get possible attacks for field / occupancy state index
+	// get possible attacks for field / occupancy state index
 	return rookMoveRankAttacks[sourceIndex][stateIndexRank] | rookMoveFileAttacks[sourceIndex][stateIndexFile]
 }
 
@@ -155,7 +155,7 @@ func RookAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board 
 	pieces := board.Pieces[color][chessboard.Rook] | board.Pieces[color][chessboard.Queen]
 	attacks := bitboard.Empty
 
-	//for all rooks
+	// for all rooks
 	for pieces != bitboard.Empty {
 		attacks |= oneRookAttacks(pieces.BitPop(), board.BoardOfAllPieces()) //TODO: try to cache BoardOfAllPieces
 	}
@@ -168,20 +168,20 @@ func RookMoves(board chessboard.Board, moves *[]Move) {
 
 	for i := 0; i < 2; i++ { // rooks and queens
 
-		//for all rooks
+		// for all rooks
 		for rook != bitboard.Empty {
-			//get next rook
+			// get next rook
 			fromIndex := rook.BitPop()
 
 			movesBoard := oneRookAttacks(fromIndex, board.BoardOfAllPieces()) & board.BoardAvailableToAttack() //TODO: try to cache BoardOfAllPieces and BoardAvailableToAttack
 
-			//for all moves
+			// for all moves
 			for movesBoard != bitboard.Empty {
 				toIndex := movesBoard.BitPop()
 				*moves = append(*moves, Move{Piece: movingPiece, From: index.Index(fromIndex), To: index.Index(toIndex)})
 			}
 		}
-		//switch to queen
+		// switch to queen
 		movingPiece = chessboard.Queen
 		rook = board.Pieces[board.NextMove][movingPiece]
 	}

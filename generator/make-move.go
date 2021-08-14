@@ -10,7 +10,6 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 	sourceIndex := m.From
 	targetIndex := m.To
 
-	//TODO: test perf if removed
 	if sourceIndex == targetIndex {
 		return board
 	}
@@ -21,11 +20,13 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 
 	board.HalfMoveClock += 1
 
+	// reset enPassant
 	if board.EnPassantTarget != 0 {
 		board.ZobristHash ^= chessboard.ZobristKeys.EnPassant[board.EnPassantTarget]
 		board.EnPassantTarget = 0
 	}
 
+	// reset castling
 	if board.Castling[chessboard.White] != 0 {
 		board.ZobristHash ^= chessboard.ZobristKeys.Castling[chessboard.White][board.Castling[chessboard.White]]
 	}
@@ -34,10 +35,12 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 		board.ZobristHash ^= chessboard.ZobristKeys.Castling[chessboard.Black][board.Castling[chessboard.Black]]
 	}
 
+	// make the move
 	board.Pieces[board.NextMove][m.Piece] ^= sourceBitBoard | targetBitBoard
 	board.ZobristHash ^= chessboard.ZobristKeys.Pieces[board.NextMove][m.Piece][sourceIndex] ^ chessboard.ZobristKeys.Pieces[board.NextMove][m.Piece][targetIndex]
 
 	if m.Piece == chessboard.Rook {
+		// check castling
 		if board.NextMove == chessboard.White {
 			if sourceIndex == index.A1 {
 				board.Castling[board.NextMove] &= ^chessboard.CastlingQueenSide
@@ -52,6 +55,7 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 			}
 		}
 	} else if m.Piece == chessboard.King {
+		// check castling
 		board.Castling[board.NextMove] = chessboard.CastlingNone
 
 		if board.NextMove == chessboard.White {
@@ -80,7 +84,7 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 	} else if m.Piece == chessboard.Pawn {
 		board.HalfMoveClock = 0
 
-		//initial pawn double move
+		// initial pawn double move
 		if absInt(int(targetIndex)-int(sourceIndex)) > 10 {
 			var n index.Index = 8
 			if board.NextMove == chessboard.Black {
@@ -98,6 +102,7 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 
 	isCapture := targetBitBoard&board.BoardOfOpponentPieces() != 0
 	if isCapture || m.IsEnPassant {
+		// check capture
 		board.HalfMoveClock = 0
 
 		checkCapture := func(piece chessboard.Piece) bool {
@@ -142,6 +147,8 @@ func (m *Move) MakeMove(board chessboard.Board) chessboard.Board {
 	if board.NextMove == chessboard.Black {
 		board.FullMoveNumber += 1
 	}
+
+	// update Zobrist
 
 	board.NextMove = opponentColor
 	board.ZobristHash ^= chessboard.ZobristKeys.Side

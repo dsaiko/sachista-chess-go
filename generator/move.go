@@ -16,7 +16,7 @@ type Move struct {
 }
 
 // String move notation
-func (m *Move) String() string {
+func (m Move) String() string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString(m.From.String())
