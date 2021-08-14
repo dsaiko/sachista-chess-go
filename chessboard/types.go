@@ -18,19 +18,6 @@ const (
 	CastlingBothSides Castling = 3
 )
 
-type Piece int
-
-//Piece index is used in ChessBoard.Pieces as index
-const (
-	King    Piece = 0
-	Queen   Piece = 1
-	Bishop  Piece = 2
-	Knight  Piece = 3
-	Rook    Piece = 4
-	Pawn    Piece = 5
-	NoPiece Piece = -1
-)
-
 type Color int
 
 const (

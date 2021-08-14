@@ -22,19 +22,19 @@ func TestBoard_RemoveCastling(t *testing.T) {
 }
 
 func TestBoard_Stats(t *testing.T) {
-	b := StandardBoard()
+	b := Standard()
 
-	assert.Equal(t, 32, b.AllPieces().PopCount())
-	assert.Equal(t, 16, b.OpponentPieces().PopCount())
-	assert.Equal(t, 64-16, b.BoardAvailable().PopCount())
+	assert.Equal(t, 32, b.BoardOfAllPieces().PopCount())
+	assert.Equal(t, 16, b.BoardOfOpponentPieces().PopCount())
+	assert.Equal(t, 64-16, b.BoardAvailableToAttack().PopCount())
 
 	assert.Equal(t, index.E1, b.MyKingIndex())
 	assert.Equal(t, index.E8, b.OpponentKingIndex())
 }
 
 func TestBoard_UpdateZobrist(t *testing.T) {
-	b1 := StandardBoard()
-	b2 := StandardBoard()
+	b1 := Standard()
+	b2 := Standard()
 
 	assert.Equal(t, b1.ZobristHash, b2.ZobristHash)
 

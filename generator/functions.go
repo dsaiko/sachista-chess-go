@@ -113,21 +113,21 @@ func isOpponentsKingNotUnderCheck(board *chessboard.Board) bool {
 
 	rooks := pieces[chessboard.Queen] | pieces[chessboard.Rook]
 
-	if rookMoveRankAttacks[kingIndex][(board.AllPieces()&rookMoveRankMask[kingIndex])>>rookMoveRankShift[kingIndex]]&rooks != 0 {
+	if rookMoveRankAttacks[kingIndex][(board.BoardOfAllPieces()&rookMoveRankMask[kingIndex])>>rookMoveRankShift[kingIndex]]&rooks != 0 {
 		return false
 	}
 
-	if rookMoveFileAttacks[kingIndex][((board.AllPieces()&rookMoveFileMask[kingIndex])*rookMoveFileMagic[kingIndex])>>57]&rooks != 0 {
+	if rookMoveFileAttacks[kingIndex][((board.BoardOfAllPieces()&rookMoveFileMask[kingIndex])*rookMoveFileMagic[kingIndex])>>57]&rooks != 0 {
 		return false
 	}
 
 	bishops := pieces[chessboard.Queen] | pieces[chessboard.Bishop]
 
-	if bishopMoveA8H1Attacks[kingIndex][((board.AllPieces()&bishopMoveA8H1Mask[kingIndex])*bishopMoveA8H1Magic[kingIndex])>>57]&bishops != 0 {
+	if bishopMoveA8H1Attacks[kingIndex][((board.BoardOfAllPieces()&bishopMoveA8H1Mask[kingIndex])*bishopMoveA8H1Magic[kingIndex])>>57]&bishops != 0 {
 		return false
 	}
 
-	if bishopMoveA1H8Attacks[kingIndex][((board.AllPieces()&bishopMoveA1H8Mask[kingIndex])*bishopMoveA1H8Magic[kingIndex])>>57]&bishops != 0 {
+	if bishopMoveA1H8Attacks[kingIndex][((board.BoardOfAllPieces()&bishopMoveA1H8Mask[kingIndex])*bishopMoveA1H8Magic[kingIndex])>>57]&bishops != 0 {
 		return false
 	}
 

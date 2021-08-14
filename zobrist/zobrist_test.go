@@ -7,7 +7,7 @@ import (
 )
 
 func TestNewZobrist(t *testing.T) {
-	z := NewZobristRandoms()
+	z := NewZobristKeys()
 
 	// Check that all generated random keys are unique
 

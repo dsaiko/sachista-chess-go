@@ -6,13 +6,15 @@ import (
 	"saiko.cz/sachista/zobrist"
 )
 
-var ZobristRandoms = zobrist.NewZobristRandoms()
+var ZobristKeys = zobrist.NewZobristKeys()
 
+// Empty chessboard
 func Empty() *Board {
 	return &Board{FullMoveNumber: 1}
 }
 
-func StandardBoard() *Board {
+// Standard chessboard layout
+func Standard() *Board {
 	b := Empty()
 	b.Pieces[White][Rook] = bitboard.A1 | bitboard.H1
 	b.Pieces[White][Knight] = bitboard.B1 | bitboard.G1
@@ -35,7 +37,8 @@ func StandardBoard() *Board {
 	return b
 }
 
-func (b *Board) PiecesOfColor(color Color) bitboard.Board {
+// BoardOfColor bitboard of all pieces of one color
+func (b *Board) BoardOfColor(color Color) bitboard.Board {
 	return b.Pieces[color][Queen] |
 		b.Pieces[color][King] |
 		b.Pieces[color][Rook] |
@@ -44,112 +47,47 @@ func (b *Board) PiecesOfColor(color Color) bitboard.Board {
 		b.Pieces[color][Pawn]
 }
 
-func (b *Board) AllPieces() bitboard.Board {
-	return b.PiecesOfColor(White) | b.PiecesOfColor(Black)
+// BoardOfAllPieces bitboard of all pieces
+func (b *Board) BoardOfAllPieces() bitboard.Board {
+	return b.BoardOfColor(White) | b.BoardOfColor(Black)
 }
 
-func (b *Board) MyColor() Color {
-	return b.NextMove
-}
-
+// OpponentColor ...
 func (b *Board) OpponentColor() Color {
 	if b.NextMove == White {
 		return Black
-	} else {
-		return White
 	}
+	return White
 }
 
-// TODO: perftest b* vs b
-func (b *Board) MyPieces() bitboard.Board {
-	return b.PiecesOfColor(b.NextMove)
+// BoardOfMyPieces ...
+func (b *Board) BoardOfMyPieces() bitboard.Board {
+	return b.BoardOfColor(b.NextMove)
 }
 
-func (b *Board) OpponentPieces() bitboard.Board {
-	return b.PiecesOfColor(b.OpponentColor())
+// BoardOfOpponentPieces ...
+func (b *Board) BoardOfOpponentPieces() bitboard.Board {
+	return b.BoardOfColor(b.OpponentColor())
 }
 
-func (b *Board) BoardAvailable() bitboard.Board {
-	return ^b.MyPieces()
+// BoardAvailableToAttack ..
+func (b *Board) BoardAvailableToAttack() bitboard.Board {
+	return ^b.BoardOfMyPieces()
 }
 
+// MyKingIndex ...
 func (b *Board) MyKingIndex() index.Index {
-	return index.Index(b.Pieces[b.MyColor()][King].BitScan())
+	return index.Index(b.Pieces[b.NextMove][King].BitScan())
 }
 
+// OpponentKingIndex ...
 func (b *Board) OpponentKingIndex() index.Index {
 	return index.Index(b.Pieces[b.OpponentColor()][King].BitScan())
 }
 
+// RemoveCastling option from a side
 func (b *Board) RemoveCastling(color Color, castling Castling) {
 	b.Castling[color] &= ^castling
-}
-
-func (p Piece) String(color Color) string {
-	if color == White {
-		switch p {
-		case King:
-			return "K"
-		case Queen:
-			return "Q"
-		case Bishop:
-			return "B"
-		case Rook:
-			return "R"
-		case Knight:
-			return "N"
-		case Pawn:
-			return "P"
-		}
-	} else {
-		switch p {
-		case King:
-			return "k"
-		case Queen:
-			return "q"
-		case Bishop:
-			return "b"
-		case Rook:
-			return "r"
-		case Knight:
-			return "n"
-		case Pawn:
-			return "p"
-		}
-	}
-	return "?"
-}
-
-func PieceFromNotation(c string) (Piece, Color) {
-	switch c {
-	case "K":
-		return King, White
-	case "Q":
-		return Queen, White
-	case "B":
-		return Bishop, White
-	case "R":
-		return Rook, White
-	case "N":
-		return Knight, White
-	case "P":
-		return Pawn, White
-
-	case "k":
-		return King, Black
-	case "q":
-		return Queen, Black
-	case "b":
-		return Bishop, Black
-	case "r":
-		return Rook, Black
-	case "n":
-		return Knight, Black
-	case "p":
-		return Pawn, Black
-	}
-
-	return NoPiece, White
 }
 
 func (c Color) String() string {
@@ -168,19 +106,19 @@ func (b *Board) ComputeZobrist() uint64 {
 	hash := uint64(0)
 
 	if b.NextMove != White {
-		hash ^= ZobristRandoms.RndSide
+		hash ^= ZobristKeys.RndSide
 	}
 
 	if b.Castling[White] != 0 {
-		hash ^= ZobristRandoms.RndCastling[White][b.Castling[White]]
+		hash ^= ZobristKeys.RndCastling[White][b.Castling[White]]
 	}
 
 	if b.Castling[Black] != 0 {
-		hash ^= ZobristRandoms.RndCastling[Black][b.Castling[Black]]
+		hash ^= ZobristKeys.RndCastling[Black][b.Castling[Black]]
 	}
 
 	if b.EnPassantTarget != 0 {
-		hash ^= ZobristRandoms.RndEnPassant[b.EnPassantTarget]
+		hash ^= ZobristKeys.RndEnPassant[b.EnPassantTarget]
 	}
 
 	for color := 0; color < 2; color++ {
@@ -188,7 +126,7 @@ func (b *Board) ComputeZobrist() uint64 {
 			pieces := b.Pieces[color][piece]
 
 			for pieces > 0 {
-				hash ^= ZobristRandoms.RndPieces[color][piece][pieces.BitPop()]
+				hash ^= ZobristKeys.RndPieces[color][piece][pieces.BitPop()]
 			}
 		}
 	}

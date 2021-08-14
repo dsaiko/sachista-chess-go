@@ -22,15 +22,15 @@ import (
 	"saiko.cz/sachista/constants"
 )
 
-type Zobrist struct {
+type ZobristKeys struct {
 	RndPieces    [constants.NumberOfColors][constants.NumberOfPieces + 1][constants.NumberOfSquares]uint64
 	RndCastling  [constants.NumberOfColors][constants.NumberOfCastlingOptions]uint64
 	RndEnPassant [constants.NumberOfSquares]uint64
 	RndSide      uint64
 }
 
-func NewZobristRandoms() *Zobrist {
-	z := &Zobrist{}
+func NewZobristKeys() *ZobristKeys {
+	z := &ZobristKeys{}
 
 	// Generate random values for all unique states
 	// We do not need to seed the generator, numbers may be the same each time

@@ -55,7 +55,7 @@ func KingMoves(board *chessboard.Board, moves *[]Move) {
 	}
 
 	kingIndex := index.Index(king.BitScan())
-	movesBoard := kingMovesCache[kingIndex] & board.BoardAvailable()
+	movesBoard := kingMovesCache[kingIndex] & board.BoardAvailableToAttack()
 
 	//for all moves
 	for movesBoard != bitboard.Empty {
@@ -71,13 +71,13 @@ func KingMoves(board *chessboard.Board, moves *[]Move) {
 
 	if board.NextMove == chessboard.White {
 		//if castling available
-		if (board.Castling[chessboard.White]&chessboard.CastlingKingSide != 0) && (board.AllPieces()&WhiteCastleOOEmpty == 0) {
+		if (board.Castling[chessboard.White]&chessboard.CastlingKingSide != 0) && (board.BoardOfAllPieces()&WhiteCastleOOEmpty == 0) {
 			if !IsBitmaskUnderAttack(board, chessboard.Black, WhiteCastleOOAttacks) {
 				//add short castling move
 				*moves = append(*moves, Move{Piece: chessboard.King, From: kingIndex, To: index.G1})
 			}
 		}
-		if (board.Castling[chessboard.White]&chessboard.CastlingQueenSide != 0) && (board.AllPieces()&WhiteCastleOOOEmpty == 0) {
+		if (board.Castling[chessboard.White]&chessboard.CastlingQueenSide != 0) && (board.BoardOfAllPieces()&WhiteCastleOOOEmpty == 0) {
 			if !IsBitmaskUnderAttack(board, chessboard.Black, WhiteCastleOOOAttacks) {
 				//add long castling move
 				*moves = append(*moves, Move{Piece: chessboard.King, From: kingIndex, To: index.C1})
@@ -86,13 +86,13 @@ func KingMoves(board *chessboard.Board, moves *[]Move) {
 
 	} else {
 		//if castling available
-		if (board.Castling[chessboard.Black]&chessboard.CastlingKingSide != 0) && (board.AllPieces()&BlackCastleOOEmpty == 0) {
+		if (board.Castling[chessboard.Black]&chessboard.CastlingKingSide != 0) && (board.BoardOfAllPieces()&BlackCastleOOEmpty == 0) {
 			if !IsBitmaskUnderAttack(board, chessboard.White, BlackCastleOOAttacks) {
 				//add short castling move
 				*moves = append(*moves, Move{Piece: chessboard.King, From: kingIndex, To: index.G8})
 			}
 		}
-		if (board.Castling[chessboard.Black]&chessboard.CastlingQueenSide != 0) && (board.AllPieces()&BlackCastleOOOEmpty == 0) {
+		if (board.Castling[chessboard.Black]&chessboard.CastlingQueenSide != 0) && (board.BoardOfAllPieces()&BlackCastleOOOEmpty == 0) {
 			if !IsBitmaskUnderAttack(board, chessboard.White, BlackCastleOOOAttacks) {
 				//add long castling move
 				*moves = append(*moves, Move{Piece: chessboard.King, From: kingIndex, To: index.C8})

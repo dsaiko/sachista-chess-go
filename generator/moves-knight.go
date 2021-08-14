@@ -41,7 +41,7 @@ func KnightMoves(board *chessboard.Board, moves *[]Move) {
 
 	for pieces != bitboard.Empty {
 		sourceIndex := pieces.BitPop()
-		target := knightMovesCache[sourceIndex] & board.BoardAvailable()
+		target := knightMovesCache[sourceIndex] & board.BoardAvailableToAttack()
 
 		for target != bitboard.Empty {
 			targetIndex := target.BitPop()

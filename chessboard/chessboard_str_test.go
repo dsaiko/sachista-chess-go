@@ -10,7 +10,7 @@ import (
 )
 
 func TestBoard_String(t *testing.T) {
-	b := StandardBoard()
+	b := Standard()
 
 	b.Pieces[White][Queen] = bitboard.D5
 
@@ -29,11 +29,11 @@ func TestBoard_String(t *testing.T) {
 }
 
 func TestStandardBoard(t *testing.T) {
-	b := StandardBoard()
+	b := Standard()
 
-	assert.Equal(t, 16, b.PiecesOfColor(White).PopCount())
-	assert.Equal(t, 16, b.PiecesOfColor(Black).PopCount())
-	assert.Equal(t, 32, b.AllPieces().PopCount())
+	assert.Equal(t, 16, b.BoardOfColor(White).PopCount())
+	assert.Equal(t, 16, b.BoardOfColor(Black).PopCount())
+	assert.Equal(t, 32, b.BoardOfAllPieces().PopCount())
 
 	expected := `  a b c d e f g h
 8 r n b q k b n r 8

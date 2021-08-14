@@ -16,7 +16,7 @@ func TestPerfT(t *testing.T) {
 		want  uint64
 	}{
 		{
-			board: chessboard.StandardBoard(),
+			board: chessboard.Standard(),
 			depth: 5,
 			want:  4_865_609,
 		},

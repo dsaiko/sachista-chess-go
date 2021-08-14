@@ -220,7 +220,7 @@ func BishopAttacks(board *chessboard.Board, color chessboard.Color) bitboard.Boa
 
 	//for all rooks
 	for pieces != bitboard.Empty {
-		attacks |= oneBishopAttacks(pieces.BitPop(), board.AllPieces()) //TODO: try to cache AllPieces
+		attacks |= oneBishopAttacks(pieces.BitPop(), board.BoardOfAllPieces()) //TODO: try to cache BoardOfAllPieces
 	}
 	return attacks
 }
@@ -236,7 +236,7 @@ func BishopMoves(board *chessboard.Board, moves *[]Move) {
 			//get next rook
 			fromIndex := bishop.BitPop()
 
-			movesBoard := oneBishopAttacks(fromIndex, board.AllPieces()) & board.BoardAvailable() //TODO: try to cache AllPieces and BoardAvailable
+			movesBoard := oneBishopAttacks(fromIndex, board.BoardOfAllPieces()) & board.BoardAvailableToAttack() //TODO: try to cache BoardOfAllPieces and BoardAvailableToAttack
 
 			//for all moves
 			for movesBoard != bitboard.Empty {

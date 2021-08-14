@@ -35,7 +35,7 @@ func PawnAttacks(board *chessboard.Board, color chessboard.Color) bitboard.Board
 }
 
 func PawnMoves(board *chessboard.Board, moves *[]Move) {
-	emptyBoard := ^board.AllPieces()
+	emptyBoard := ^board.BoardOfAllPieces()
 
 	whiteBaseRank := 16
 	blackBaseRank := 999
@@ -67,7 +67,7 @@ func PawnMoves(board *chessboard.Board, moves *[]Move) {
 
 		//get attacks, only against opponent pieces
 		attacks := pawnAttacksCache[board.NextMove][sourceIndex]
-		movesBoard |= attacks & board.OpponentPieces()
+		movesBoard |= attacks & board.BoardOfOpponentPieces()
 
 		//for all moves
 		for movesBoard != bitboard.Empty {
