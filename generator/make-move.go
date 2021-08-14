@@ -11,7 +11,6 @@ import (
 //TODO: try recompute zobrist vs modify zobrist
 //TODO: test pointers
 func (m *Move) MakeMove(board chessboard.Board) *chessboard.Board {
-
 	sourceIndex := m.From
 	targetIndex := m.To
 
@@ -25,9 +24,22 @@ func (m *Move) MakeMove(board chessboard.Board) *chessboard.Board {
 	opponentColor := board.OpponentColor()
 
 	board.HalfMoveClock += 1
-	board.EnPassantTarget = 0
+
+	if board.EnPassantTarget != 0 {
+		board.ZobristHash ^= chessboard.ZobristRandoms.RndEnPassant[board.EnPassantTarget]
+		board.EnPassantTarget = 0
+	}
+
+	if board.Castling[chessboard.White] != 0 {
+		board.ZobristHash ^= chessboard.ZobristRandoms.RndCastling[chessboard.White][board.Castling[chessboard.White]]
+	}
+
+	if board.Castling[chessboard.Black] != 0 {
+		board.ZobristHash ^= chessboard.ZobristRandoms.RndCastling[chessboard.Black][board.Castling[chessboard.Black]]
+	}
 
 	board.Pieces[board.NextMove][m.Piece] ^= sourceBitBoard | targetBitBoard
+	board.ZobristHash ^= chessboard.ZobristRandoms.RndPieces[board.NextMove][m.Piece][sourceIndex] ^ chessboard.ZobristRandoms.RndPieces[board.NextMove][m.Piece][targetIndex]
 
 	if m.Piece == chessboard.Rook {
 		if board.NextMove == chessboard.White {
@@ -51,8 +63,10 @@ func (m *Move) MakeMove(board chessboard.Board) *chessboard.Board {
 				//handle castling
 				if targetIndex == index.C1 {
 					board.Pieces[board.NextMove][chessboard.Rook] ^= bitboard.A1 | bitboard.D1
+					board.ZobristHash ^= chessboard.ZobristRandoms.RndPieces[board.NextMove][chessboard.Rook][index.A1] ^ chessboard.ZobristRandoms.RndPieces[board.NextMove][chessboard.Rook][index.D1]
 				} else if targetIndex == index.G1 {
 					board.Pieces[board.NextMove][chessboard.Rook] ^= bitboard.H1 | bitboard.F1
+					board.ZobristHash ^= chessboard.ZobristRandoms.RndPieces[board.NextMove][chessboard.Rook][index.H1] ^ chessboard.ZobristRandoms.RndPieces[board.NextMove][chessboard.Rook][index.F1]
 				}
 			}
 		} else {
@@ -60,8 +74,10 @@ func (m *Move) MakeMove(board chessboard.Board) *chessboard.Board {
 				//handle castling
 				if targetIndex == index.C8 {
 					board.Pieces[board.NextMove][chessboard.Rook] ^= bitboard.A8 | bitboard.D8
+					board.ZobristHash ^= chessboard.ZobristRandoms.RndPieces[board.NextMove][chessboard.Rook][index.A8] ^ chessboard.ZobristRandoms.RndPieces[board.NextMove][chessboard.Rook][index.D8]
 				} else if targetIndex == index.G8 {
 					board.Pieces[board.NextMove][chessboard.Rook] ^= bitboard.H8 | bitboard.F8
+					board.ZobristHash ^= chessboard.ZobristRandoms.RndPieces[board.NextMove][chessboard.Rook][index.H8] ^ chessboard.ZobristRandoms.RndPieces[board.NextMove][chessboard.Rook][index.F8]
 				}
 			}
 		}
@@ -77,7 +93,10 @@ func (m *Move) MakeMove(board chessboard.Board) *chessboard.Board {
 			board.EnPassantTarget = sourceIndex + n
 		} else if m.PromotionPiece > 0 {
 			board.Pieces[board.NextMove][chessboard.Pawn] ^= targetBitBoard
+			board.ZobristHash ^= chessboard.ZobristRandoms.RndPieces[board.NextMove][chessboard.Pawn][targetIndex]
+
 			board.Pieces[board.NextMove][m.PromotionPiece] ^= targetBitBoard
+			board.ZobristHash ^= chessboard.ZobristRandoms.RndPieces[board.NextMove][m.PromotionPiece][targetIndex]
 		}
 	}
 
@@ -88,6 +107,7 @@ func (m *Move) MakeMove(board chessboard.Board) *chessboard.Board {
 		checkCapture := func(piece chessboard.Piece) bool {
 			if board.Pieces[opponentColor][piece]&targetBitBoard != 0 {
 				board.Pieces[opponentColor][piece] ^= targetBitBoard
+				board.ZobristHash ^= chessboard.ZobristRandoms.RndPieces[opponentColor][piece][targetIndex]
 				return true
 			}
 			return false
@@ -97,8 +117,10 @@ func (m *Move) MakeMove(board chessboard.Board) *chessboard.Board {
 		case m.IsEnPassant:
 			if board.NextMove == chessboard.White {
 				board.Pieces[chessboard.Black][chessboard.Pawn] ^= targetBitBoard.OneSouth()
+				board.ZobristHash ^= chessboard.ZobristRandoms.RndPieces[chessboard.Black][chessboard.Pawn][targetIndex-8]
 			} else {
 				board.Pieces[chessboard.White][chessboard.Pawn] ^= targetBitBoard.OneNorth()
+				board.ZobristHash ^= chessboard.ZobristRandoms.RndPieces[chessboard.White][chessboard.Pawn][targetIndex+8]
 			}
 		case checkCapture(chessboard.Bishop):
 		case checkCapture(chessboard.Knight):
@@ -126,8 +148,20 @@ func (m *Move) MakeMove(board chessboard.Board) *chessboard.Board {
 	}
 
 	board.NextMove = opponentColor
+	board.ZobristHash ^= chessboard.ZobristRandoms.RndSide
 
-	board.UpdateZobrist()
+	if board.Castling[chessboard.White] != 0 {
+		board.ZobristHash ^= chessboard.ZobristRandoms.RndCastling[chessboard.White][board.Castling[chessboard.White]]
+	}
+
+	if board.Castling[chessboard.Black] != 0 {
+		board.ZobristHash ^= chessboard.ZobristRandoms.RndCastling[chessboard.Black][board.Castling[chessboard.Black]]
+	}
+
+	if board.EnPassantTarget != 0 {
+		board.ZobristHash ^= chessboard.ZobristRandoms.RndEnPassant[board.EnPassantTarget]
+	}
+
 	return &board
 }
 

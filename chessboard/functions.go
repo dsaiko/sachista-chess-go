@@ -6,7 +6,7 @@ import (
 	"saiko.cz/sachista/zobrist"
 )
 
-var rndZobrist = zobrist.NewZobrist()
+var ZobristRandoms = zobrist.NewZobristRandoms()
 
 func Empty() *Board {
 	return &Board{FullMoveNumber: 1}
@@ -31,7 +31,7 @@ func StandardBoard() *Board {
 	b.Castling[White] = CastlingBothSides
 	b.Castling[Black] = CastlingBothSides
 
-	b.UpdateZobrist()
+	b.ZobristHash = b.ComputeZobrist()
 	return b
 }
 
@@ -85,67 +85,67 @@ func (b *Board) RemoveCastling(color Color, castling Castling) {
 	b.Castling[color] &= ^castling
 }
 
-func (p Piece) Notation(color Color) byte {
+func (p Piece) String(color Color) string {
 	if color == White {
 		switch p {
 		case King:
-			return 'K'
+			return "K"
 		case Queen:
-			return 'Q'
+			return "Q"
 		case Bishop:
-			return 'B'
+			return "B"
 		case Rook:
-			return 'R'
+			return "R"
 		case Knight:
-			return 'N'
+			return "N"
 		case Pawn:
-			return 'P'
+			return "P"
 		}
 	} else {
 		switch p {
 		case King:
-			return 'k'
+			return "k"
 		case Queen:
-			return 'q'
+			return "q"
 		case Bishop:
-			return 'b'
+			return "b"
 		case Rook:
-			return 'r'
+			return "r"
 		case Knight:
-			return 'n'
+			return "n"
 		case Pawn:
-			return 'p'
+			return "p"
 		}
 	}
-	return '?'
+	return "?"
 }
 
-func PieceFromNotation(c byte) (Piece, Color) {
+func PieceFromNotation(c string) (Piece, Color) {
 	switch c {
-	case 'K':
+	case "K":
 		return King, White
-	case 'Q':
+	case "Q":
 		return Queen, White
-	case 'B':
+	case "B":
 		return Bishop, White
-	case 'R':
+	case "R":
 		return Rook, White
-	case 'N':
+	case "N":
 		return Knight, White
-	case 'P':
+	case "P":
 		return Pawn, White
 
-	case 'k':
+	case "k":
 		return King, Black
-	case 'q':
+	case "q":
 		return Queen, Black
-	case 'b':
+	case "b":
 		return Bishop, Black
-	case 'r':
+	case "r":
 		return Rook, Black
-	case 'n':
+	case "n":
 		return Knight, Black
-	case 'p':
+	case "p":
 		return Pawn, Black
 	}
 
@@ -163,23 +163,24 @@ func (c Color) String() string {
 	}
 }
 
-func (b *Board) UpdateZobrist() {
+//TODO b vs *b perf
+func (b *Board) ComputeZobrist() uint64 {
 	hash := uint64(0)
 
 	if b.NextMove != White {
-		hash ^= rndZobrist.RndSide
+		hash ^= ZobristRandoms.RndSide
 	}
 
 	if b.Castling[White] != 0 {
-		hash ^= rndZobrist.RndCastling[White][b.Castling[White]]
+		hash ^= ZobristRandoms.RndCastling[White][b.Castling[White]]
 	}
 
 	if b.Castling[Black] != 0 {
-		hash ^= rndZobrist.RndCastling[Black][b.Castling[Black]]
+		hash ^= ZobristRandoms.RndCastling[Black][b.Castling[Black]]
 	}
 
 	if b.EnPassantTarget != 0 {
-		hash ^= rndZobrist.RndEnPassant[b.EnPassantTarget]
+		hash ^= ZobristRandoms.RndEnPassant[b.EnPassantTarget]
 	}
 
 	for color := 0; color < 2; color++ {
@@ -187,10 +188,10 @@ func (b *Board) UpdateZobrist() {
 			pieces := b.Pieces[color][piece]
 
 			for pieces > 0 {
-				hash ^= rndZobrist.RndPieces[color][piece][pieces.BitPop()]
+				hash ^= ZobristRandoms.RndPieces[color][piece][pieces.BitPop()]
 			}
 		}
 	}
 
-	b.ZobristHash = hash
+	return hash
 }

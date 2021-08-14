@@ -2,9 +2,9 @@ package generator
 
 import (
 	"bytes"
-
 	"saiko.cz/sachista/bitboard"
 	"saiko.cz/sachista/chessboard"
+	"saiko.cz/sachista/constants"
 )
 
 func (m *Move) String() string {
@@ -14,7 +14,7 @@ func (m *Move) String() string {
 	buffer.WriteString(m.To.String())
 
 	if m.PromotionPiece > 0 { //this excludes NoPiece and King
-		buffer.WriteString(string(m.PromotionPiece.Notation(chessboard.Black)))
+		buffer.WriteString(m.PromotionPiece.String(chessboard.Black))
 	}
 
 	return buffer.String()
@@ -62,13 +62,28 @@ func IsBitmaskUnderAttack(board *chessboard.Board, color chessboard.Color, field
 //TODO reorganize
 //TODO make function which returns only legal moves
 //TODO test *Board
-//TODO rename to CompuTEMoves
-func Moves(board *chessboard.Board, moves *[]Move) {
-	KnightMoves(board, moves)
-	PawnMoves(board, moves)
-	KingMoves(board, moves)
-	RookMoves(board, moves)
-	BishopMoves(board, moves)
+func GeneratePseudoLegalMoves(b *chessboard.Board, moves *[]Move) {
+	KnightMoves(b, moves)
+	PawnMoves(b, moves)
+	KingMoves(b, moves)
+	RookMoves(b, moves)
+	BishopMoves(b, moves)
+}
+
+func GenerateLegalMoves(b *chessboard.Board) []Move {
+	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
+	legalMoves := make([]Move, 0, constants.MovesCacheInitialCapacity)
+
+	GeneratePseudoLegalMoves(b, &moves)
+
+	for _, m := range moves {
+		nextBoard := m.MakeMove(*b)
+		if isOpponentsKingNotUnderCheck(nextBoard) {
+			legalMoves = append(legalMoves, m)
+		}
+	}
+
+	return legalMoves
 }
 
 func isOpponentsKingNotUnderCheck(board *chessboard.Board) bool {

@@ -11,7 +11,7 @@ import (
 func PerfT(b *chessboard.Board, depth int) uint64 {
 	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
 
-	Moves(b, &moves)
+	GeneratePseudoLegalMoves(b, &moves)
 
 	var count uint64 = 0
 	attacks := Attacks(b, b.OpponentColor())

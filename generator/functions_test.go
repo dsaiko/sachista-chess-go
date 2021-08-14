@@ -22,7 +22,7 @@ func testMovesFromString(t *testing.T, expectedCount int, stringBoard string) {
 	board := chessboard.FromString(stringBoard)
 	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
 
-	Moves(board, &moves)
+	GeneratePseudoLegalMoves(board, &moves)
 	assert.Equal(t, expectedCount, len(moves))
 }
 
@@ -30,7 +30,7 @@ func testMovesFromFEN(t *testing.T, expectedCount int, fen string) {
 	board := chessboard.FromFen(fen)
 	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
 
-	Moves(board, &moves)
+	GeneratePseudoLegalMoves(board, &moves)
 	assert.Equal(t, expectedCount, len(moves))
 }
 

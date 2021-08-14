@@ -1,12 +1,13 @@
 package zobrist
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewZobrist(t *testing.T) {
-	z := NewZobrist()
+	z := NewZobristRandoms()
 
 	// Check that all generated random keys are unique
 

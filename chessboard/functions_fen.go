@@ -43,39 +43,39 @@ func (b *Board) ToFEN() string {
 			}
 		}
 
-		c := byte(0)
+		c := ""
 		test := bitboard.Board(1 << i)
 
 		switch {
 		case whiteKing&test != 0:
-			c = King.Notation(White)
+			c = King.String(White)
 		case whiteQueen&test != 0:
-			c = Queen.Notation(White)
+			c = Queen.String(White)
 		case whiteRook&test != 0:
-			c = Rook.Notation(White)
+			c = Rook.String(White)
 		case whiteKnight&test != 0:
-			c = Knight.Notation(White)
+			c = Knight.String(White)
 		case whiteBishop&test != 0:
-			c = Bishop.Notation(White)
+			c = Bishop.String(White)
 		case whitePawn&test != 0:
-			c = Pawn.Notation(White)
+			c = Pawn.String(White)
 		case blackKing&test != 0:
-			c = King.Notation(Black)
+			c = King.String(Black)
 		case blackQueen&test != 0:
-			c = Queen.Notation(Black)
+			c = Queen.String(Black)
 		case blackRook&test != 0:
-			c = Rook.Notation(Black)
+			c = Rook.String(Black)
 		case blackKnight&test != 0:
-			c = Knight.Notation(Black)
+			c = Knight.String(Black)
 		case blackBishop&test != 0:
-			c = Bishop.Notation(Black)
+			c = Bishop.String(Black)
 		case blackPawn&test != 0:
-			c = Pawn.Notation(Black)
+			c = Pawn.String(Black)
 		}
 
-		if c != 0 {
+		if len(c) != 0 {
 			outputCount()
-			buffer.WriteByte(c)
+			buffer.WriteString(c)
 		} else {
 			spaces++
 		}
@@ -89,16 +89,16 @@ func (b *Board) ToFEN() string {
 
 	//Castling
 	if b.Castling[White]&CastlingKingSide != 0 {
-		buffer.WriteByte(King.Notation(White))
+		buffer.WriteString(King.String(White))
 	}
 	if b.Castling[White]&CastlingQueenSide != 0 {
-		buffer.WriteByte(Queen.Notation(White))
+		buffer.WriteString(Queen.String(White))
 	}
 	if b.Castling[Black]&CastlingKingSide != 0 {
-		buffer.WriteByte(King.Notation(Black))
+		buffer.WriteString(King.String(Black))
 	}
 	if b.Castling[Black]&CastlingQueenSide != 0 {
-		buffer.WriteByte(Queen.Notation(Black))
+		buffer.WriteString(Queen.String(Black))
 	}
 	if b.Castling[White]|b.Castling[Black] == 0 {
 		buffer.WriteString("-")
@@ -163,7 +163,7 @@ func FromFen(fen string) *Board {
 			b.Pieces[Black][Pawn] <<= 1
 
 			//set the new piece
-			piece, color := PieceFromNotation(c)
+			piece, color := PieceFromNotation(string(c))
 			if piece != NoPiece {
 				b.Pieces[color][piece] |= 1
 			}
@@ -196,7 +196,7 @@ func FromFen(fen string) *Board {
 			break
 		}
 
-		piece, color := PieceFromNotation(c)
+		piece, color := PieceFromNotation(string(c))
 
 		castling := CastlingQueenSide
 		if piece == King {
@@ -279,6 +279,6 @@ func FromFen(fen string) *Board {
 		b.Castling[Black] = CastlingNone
 	}
 
-	b.UpdateZobrist()
+	b.ZobristHash = b.ComputeZobrist()
 	return b
 }
