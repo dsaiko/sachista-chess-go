@@ -1,22 +1,10 @@
 package generator
 
 import (
-	"fmt"
-	"saiko.cz/sachista/chessboard"
-	"saiko.cz/sachista/constants"
 	"testing"
+
+	"saiko.cz/sachista/chessboard"
 )
-
-func TestFailCase1(t *testing.T) {
-	board := chessboard.FromFen("8/2p5/8/KP1P3r/1R3p1k/8/6P1/8 b - e3 0 2")
-
-	moves := make([]Move, 0, constants.MaxMoves)
-	Moves(board, &moves)
-
-	for _, m := range moves {
-		fmt.Println(m)
-	}
-}
 
 func TestPerfT(t *testing.T) {
 	tests := []struct {

@@ -1,11 +1,13 @@
 package generator
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	"saiko.cz/sachista/chessboard"
+
 	"saiko.cz/sachista/constants"
 	"saiko.cz/sachista/index"
-	"testing"
 )
 
 func TestMove_String(t *testing.T) {
@@ -18,7 +20,7 @@ func TestMove_String(t *testing.T) {
 
 func testMovesFromString(t *testing.T, expectedCount int, stringBoard string) {
 	board := chessboard.FromString(stringBoard)
-	moves := make([]Move, 0, constants.MaxMoves)
+	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
 
 	Moves(board, &moves)
 	assert.Equal(t, expectedCount, len(moves))
@@ -26,7 +28,7 @@ func testMovesFromString(t *testing.T, expectedCount int, stringBoard string) {
 
 func testMovesFromFEN(t *testing.T, expectedCount int, fen string) {
 	board := chessboard.FromFen(fen)
-	moves := make([]Move, 0, constants.MaxMoves)
+	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
 
 	Moves(board, &moves)
 	assert.Equal(t, expectedCount, len(moves))

@@ -2,9 +2,11 @@ package bitboard
 
 import (
 	"fmt"
-	"github.com/stretchr/testify/assert"
-	"saiko.cz/sachista/index"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"saiko.cz/sachista/index"
 )
 
 func TestBitBoard_BitPop(t *testing.T) {

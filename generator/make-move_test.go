@@ -1,10 +1,11 @@
 package generator
 
 import (
-	"saiko.cz/sachista/chessboard"
-	"saiko.cz/sachista/index"
 	"strings"
 	"testing"
+
+	"saiko.cz/sachista/chessboard"
+	"saiko.cz/sachista/index"
 )
 
 func TestMove_MakeMove(t *testing.T) {

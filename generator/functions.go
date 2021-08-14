@@ -2,6 +2,7 @@ package generator
 
 import (
 	"bytes"
+
 	"saiko.cz/sachista/bitboard"
 	"saiko.cz/sachista/chessboard"
 )

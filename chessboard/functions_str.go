@@ -3,9 +3,10 @@ package chessboard
 import (
 	"bytes"
 	"regexp"
+	"strconv"
+
 	"saiko.cz/sachista/bitboard"
 	"saiko.cz/sachista/constants"
-	"strconv"
 )
 
 func (b *Board) String() string {

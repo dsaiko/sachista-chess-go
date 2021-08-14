@@ -2,10 +2,11 @@ package chessboard
 
 import (
 	"bytes"
+	"strconv"
+
 	"saiko.cz/sachista/bitboard"
 	"saiko.cz/sachista/constants"
 	"saiko.cz/sachista/index"
-	"strconv"
 )
 
 func (b *Board) ToFEN() string {

@@ -3,9 +3,10 @@ package bitboard
 import (
 	"bytes"
 	"math/bits"
+	"strconv"
+
 	"saiko.cz/sachista/constants"
 	"saiko.cz/sachista/index"
-	"strconv"
 )
 
 // PopCount returns the number of bits set in the bitboard

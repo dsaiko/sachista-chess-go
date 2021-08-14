@@ -1,10 +1,12 @@
 package chessboard
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/assert"
+
 	"saiko.cz/sachista/bitboard"
 	"saiko.cz/sachista/index"
-	"testing"
 )
 
 func TestBoard_RemoveCastling(t *testing.T) {

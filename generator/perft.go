@@ -9,7 +9,7 @@ import (
 // TODO: implement cache
 // TODO: compare cache and non cached results
 func PerfT(b *chessboard.Board, depth int) uint64 {
-	moves := make([]Move, 0, constants.MaxMoves)
+	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
 
 	Moves(b, &moves)
 
