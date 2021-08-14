@@ -60,22 +60,21 @@ func IsBitmaskUnderAttack(board *chessboard.Board, color chessboard.Color, field
 }
 
 //TODO reorganize
-//TODO make function which returns only legal moves
 //TODO test *Board
-//TODO test *[]*Move
-func GeneratePseudoLegalMoves(b *chessboard.Board, moves *[]Move) {
-	KnightMoves(b, moves)
-	PawnMoves(b, moves)
-	KingMoves(b, moves)
-	RookMoves(b, moves)
-	BishopMoves(b, moves)
+func GeneratePseudoLegalMoves(b *chessboard.Board) []Move {
+	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
+
+	KnightMoves(b, &moves)
+	PawnMoves(b, &moves)
+	RookMoves(b, &moves)
+	BishopMoves(b, &moves)
+
+	return moves
 }
 
 func GenerateLegalMoves(b *chessboard.Board) []Move {
-	moves := make([]Move, 0, constants.MovesCacheInitialCapacity)
-	legalMoves := make([]Move, 0, constants.MovesCacheInitialCapacity)
-
-	GeneratePseudoLegalMoves(b, &moves)
+	moves := GeneratePseudoLegalMoves(b)
+	legalMoves := make([]Move, 0, len(moves))
 
 	for _, m := range moves {
 		nextBoard := m.MakeMove(*b)
