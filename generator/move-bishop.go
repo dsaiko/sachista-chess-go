@@ -224,7 +224,7 @@ func bishopAttacks(board chessboard.Board, color chessboard.Color) bitboard.Boar
 	return attacks
 }
 
-func BishopMoves(board chessboard.Board, handler MoveHandler) {
+func bishopMoves(board chessboard.Board, handler MoveHandler) {
 	movingPiece := chessboard.Bishop
 	bishop := board.Pieces[board.NextMove][movingPiece]
 

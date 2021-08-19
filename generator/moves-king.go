@@ -46,7 +46,7 @@ func kingAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board 
 	return kingMovesCache[king.BitScan()]
 }
 
-func KingMoves(board chessboard.Board, handler MoveHandler) {
+func kingMoves(board chessboard.Board, handler MoveHandler) {
 	king := board.Pieces[board.NextMove][chessboard.King]
 	if king == bitboard.Empty {
 		return

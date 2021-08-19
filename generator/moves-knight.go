@@ -35,7 +35,7 @@ func knightAttacks(board chessboard.Board, color chessboard.Color) bitboard.Boar
 	return attacks
 }
 
-func KnightMoves(board chessboard.Board, handler MoveHandler) {
+func knightMoves(board chessboard.Board, handler MoveHandler) {
 	pieces := board.Pieces[board.NextMove][chessboard.Knight]
 
 	for pieces != bitboard.Empty {

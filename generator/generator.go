@@ -31,11 +31,11 @@ func isBitmaskUnderAttack(board chessboard.Board, color chessboard.Color, fields
 
 // generatePseudoLegalMoves without checking legality of king check
 func generatePseudoLegalMoves(b chessboard.Board, handler MoveHandler) {
-	KnightMoves(b, handler)
+	knightMoves(b, handler)
 	pawnMoves(b, handler)
-	KingMoves(b, handler)
-	RookMoves(b, handler)
-	BishopMoves(b, handler)
+	kingMoves(b, handler)
+	rookMoves(b, handler)
+	bishopMoves(b, handler)
 }
 
 // GenerateLegalMoves ...

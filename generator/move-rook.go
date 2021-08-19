@@ -162,7 +162,7 @@ func rookAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board 
 	return attacks
 }
 
-func RookMoves(board chessboard.Board, handler MoveHandler) {
+func rookMoves(board chessboard.Board, handler MoveHandler) {
 	movingPiece := chessboard.Rook
 	rook := board.Pieces[board.NextMove][movingPiece]
 
