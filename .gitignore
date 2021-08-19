@@ -1,2 +1,4 @@
 .idea
 bin
+/cpu.prof
+/mem.prof
