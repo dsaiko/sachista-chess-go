@@ -59,3 +59,11 @@ func TestPerfT(t *testing.T) {
 		assert.Equal(t, tc.want, got)
 	}
 }
+
+func BenchmarkPerfT(b *testing.B) {
+	board := chessboard.Standard()
+
+	for i := 0; i < b.N; i++ {
+		PerfT(board, 6)
+	}
+}
