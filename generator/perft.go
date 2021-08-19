@@ -14,15 +14,14 @@ type PerfTCacheEntry struct {
 	count uint64
 }
 
+const CacheSize = 1024 * 1024
+
 // PerfTCache cache for repeated moves
-type PerfTCache struct {
-	entries   []PerfTCacheEntry
-	cacheSize uint64
-}
+type PerfTCache [CacheSize]PerfTCacheEntry
 
 // set cache item - synchronized method
 func (c *PerfTCache) set(hash uint64, depth int, count uint64) {
-	entry := &c.entries[(c.cacheSize-1)&hash]
+	entry := &c[(CacheSize-1)&hash]
 
 	entry.hash = hash
 	entry.depth = depth
@@ -31,21 +30,13 @@ func (c *PerfTCache) set(hash uint64, depth int, count uint64) {
 
 // get cache item - synchronized method
 func (c *PerfTCache) get(hash uint64, depth int) uint64 {
-	entry := &c.entries[(c.cacheSize-1)&hash]
+	entry := &c[(CacheSize-1)&hash]
 
 	if entry.hash == hash && entry.depth == depth {
 		return entry.count
 	}
 
 	return 0
-}
-
-// newCache of requested size
-func newCache(size uint64) *PerfTCache {
-	var cache PerfTCache
-	cache.cacheSize = size
-	cache.entries = make([]PerfTCacheEntry, size)
-	return &cache
 }
 
 // perfT1 single threaded min/max algorithm for searching the moves
@@ -108,7 +99,7 @@ func PerfT(b chessboard.Board, depth int) uint64 {
 		wg.Add(1)
 		go func(b chessboard.Board) {
 			defer wg.Done()
-			cache := newCache(1024 * 1024)
+			cache := &PerfTCache{}
 			results <- perfT1(cache, b, depth-1)
 		}(m.MakeMove(b))
 	}
