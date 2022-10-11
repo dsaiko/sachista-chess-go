@@ -1,4 +1,4 @@
-package index
+package bitboard
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -6,5 +6,5 @@ import (
 )
 
 func TestIndex(t *testing.T) {
-	assert.Equal(t, 63, int(H8-A1))
+	assert.Equal(t, 63, int(IndexH8-IndexA1))
 }

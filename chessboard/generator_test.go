@@ -1,35 +1,33 @@
-package generator
+package chessboard
 
 import (
+	"saiko.cz/sachista/bitboard"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"saiko.cz/sachista/chessboard"
-	"saiko.cz/sachista/index"
 )
 
 func TestMove_String(t *testing.T) {
-	move := Move{Piece: chessboard.Pawn, From: index.A2, To: index.A3}
+	move := Move{Piece: Pawn, From: bitboard.IndexA2, To: bitboard.IndexA3}
 	assert.Equal(t, "a2a3", move.String())
 
-	move = Move{Piece: chessboard.Pawn, From: index.A7, To: index.B8, PromotionPiece: chessboard.Queen}
+	move = Move{Piece: Pawn, From: bitboard.IndexA7, To: bitboard.IndexB8, PromotionPiece: Queen}
 	assert.Equal(t, "a7b8q", move.String())
 }
 
 func testMovesFromString(t *testing.T, expectedCount int, stringBoard string) {
-	board := chessboard.FromString(stringBoard)
+	board := FromString(stringBoard)
 	size := 0
-	generatePseudoLegalMoves(board, func(m Move) {
+	generatePseudoLegalMoves(&board, func(m Move) {
 		size++
 	})
 	assert.Equal(t, expectedCount, size)
 }
 
 func testMovesFromFEN(t *testing.T, expectedCount int, fen string) {
-	board := chessboard.FromFEN(fen)
+	board := BoardFromFEN(fen)
 	size := 0
-	generatePseudoLegalMoves(board, func(m Move) {
+	generatePseudoLegalMoves(&board, func(m Move) {
 		size++
 	})
 	assert.Equal(t, expectedCount, size)
@@ -39,12 +37,12 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 
 	tests := []struct {
 		name  string
-		board chessboard.Board
+		board Board
 		want  bool
 	}{
 		{
 			name: "No check",
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - - - - k - 8
 7 - - - - - - - - 7
@@ -60,7 +58,7 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 		},
 		{
 			name: "Check by King",
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - - - - k - 8
 7 - - - - - K - - 7
@@ -76,7 +74,7 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 		},
 		{
 			name: "Check by Queen 1",
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - - - - k - 8
 7 - - - - - - - - 7
@@ -92,7 +90,7 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 		},
 		{
 			name: "Check by Queen 2",
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - - - - k - 8
 7 - - - - - - - - 7
@@ -108,7 +106,7 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 		},
 		{
 			name: "No check by Bishop",
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - - - - k - 8
 7 - - - - - r - - 7
@@ -124,7 +122,7 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 		},
 		{
 			name: "Check by Bishop",
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - - - - k - 8
 7 - - - - - - - - 7
@@ -140,7 +138,7 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 		},
 		{
 			name: "Check by Rook",
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - - - - k - 8
 7 - - - - - - - - 7
@@ -156,7 +154,7 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 		},
 		{
 			name: "No check by Rook",
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - - - - k - 8
 7 - - - - - - r - 7
@@ -172,7 +170,7 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 		},
 		{
 			name: "Check by Knight",
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - - - - k - 8
 7 - - - - - - - - 7
@@ -188,7 +186,7 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 		},
 		{
 			name: "Check by Pawn",
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - - - - k - 8
 7 - - - - - P - - 7
@@ -206,7 +204,7 @@ func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := isOpponentsKingNotUnderCheck(tt.board); got != tt.want {
+			if got := isOpponentsKingNotUnderCheck(&tt.board); got != tt.want {
 				t.Errorf("isOpponentsKingNotUnderCheck() = %v, want %v", got, tt.want)
 			}
 		})

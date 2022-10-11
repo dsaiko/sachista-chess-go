@@ -2,6 +2,7 @@
 
 set -e
 
+echo "This utility allows verifying perft results stored in perft.txt against stockfish results."
 while IFS=\| read -r fen depth count
 do
 

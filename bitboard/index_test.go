@@ -1,4 +1,4 @@
-package index
+package bitboard
 
 import (
 	"fmt"
@@ -8,9 +8,9 @@ import (
 )
 
 func TestIndex_String(t *testing.T) {
-	f7 := fmt.Sprintf("%v", F7)
-	a1 := fmt.Sprintf("%v", A1)
-	h8 := fmt.Sprintf("%v", H8)
+	f7 := fmt.Sprintf("%v", IndexF7)
+	a1 := fmt.Sprintf("%v", IndexA1)
+	h8 := fmt.Sprintf("%v", IndexH8)
 
 	assert.Equal(t, "f7", f7)
 	assert.Equal(t, "a1", a1)
@@ -20,10 +20,10 @@ func TestIndex_String(t *testing.T) {
 func TestFromNotation(t *testing.T) {
 	notation := "A1"
 
-	a1 := FromNotation(notation)
-	h8 := FromNotation("h8")
+	a1 := IndexFromNotation(notation)
+	h8 := IndexFromNotation("h8")
 
 	assert.Equal(t, "A1", notation)
-	assert.Equal(t, A1, a1)
-	assert.Equal(t, H8, h8)
+	assert.Equal(t, IndexA1, a1)
+	assert.Equal(t, IndexH8, h8)
 }

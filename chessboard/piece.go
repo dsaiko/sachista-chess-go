@@ -6,14 +6,15 @@ type Piece int
 
 // Piece index is used in ChessBoard.Pieces
 const (
-	King    Piece = 0
-	Queen   Piece = 1
-	Bishop  Piece = 2
-	Knight  Piece = 3
-	Rook    Piece = 4
-	Pawn    Piece = 5
-	NoPiece Piece = -1
+	King Piece = iota
+	Queen
+	Bishop
+	Knight
+	Rook
+	Pawn
 )
+
+const NoPiece Piece = -1
 
 // String representation of a piece for given color
 func (p Piece) String(color Color) string {

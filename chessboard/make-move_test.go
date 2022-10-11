@@ -1,17 +1,15 @@
-package generator
+package chessboard
 
 import (
 	"github.com/stretchr/testify/assert"
+	"saiko.cz/sachista/bitboard"
 	"strings"
 	"testing"
-
-	"saiko.cz/sachista/chessboard"
-	"saiko.cz/sachista/index"
 )
 
 func TestMove_MakeMove(t *testing.T) {
 	tests := []struct {
-		board chessboard.Board
+		board Board
 		move  Move
 		want  string
 	}{
@@ -29,7 +27,7 @@ func TestMove_MakeMove(t *testing.T) {
   a b c d e f g h
 `},
 		{
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - r - - - - 8
 7 - - P - - - - - 7
@@ -41,7 +39,7 @@ func TestMove_MakeMove(t *testing.T) {
 1 - - - - - - - - 1
   a b c d e f g h
 `),
-			move: Move{Piece: chessboard.Pawn, From: index.C7, To: index.D8, PromotionPiece: chessboard.Queen},
+			move: Move{Piece: Pawn, From: bitboard.IndexC7, To: bitboard.IndexD8, PromotionPiece: Queen},
 			want: `
   a b c d e f g h
 8 - - - Q - - - - 8
@@ -55,7 +53,7 @@ func TestMove_MakeMove(t *testing.T) {
   a b c d e f g h
 `},
 		{
-			board: chessboard.FromString(`
+			board: FromString(`
   a b c d e f g h
 8 - - - r - - - - 8
 7 - - P - - - - - 7
@@ -67,7 +65,7 @@ func TestMove_MakeMove(t *testing.T) {
 1 - - - - - - - - 1
   a b c d e f g h
 `),
-			move: Move{Piece: chessboard.Pawn, From: index.H5, To: index.G6, IsEnPassant: true},
+			move: Move{Piece: Pawn, From: bitboard.IndexH5, To: bitboard.IndexG6, IsEnPassant: true},
 			want: `
   a b c d e f g h
 8 - - - r - - - - 8
@@ -83,7 +81,7 @@ func TestMove_MakeMove(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run("", func(t *testing.T) {
-			board2 := strings.TrimSpace(tc.move.MakeMove(tc.board).String())
+			board2 := strings.TrimSpace(tc.board.AppliedMove(tc.move).String())
 			want := strings.TrimSpace(tc.want)
 			if board2 != want {
 				t.Errorf("MakeMove() =\n%v, want\n%v", board2, want)
@@ -93,21 +91,21 @@ func TestMove_MakeMove(t *testing.T) {
 }
 
 func TestZobristFailScenarion1(t *testing.T) {
-	board := chessboard.FromFEN("r4rk1/p2pqpb1/bn2pnp1/2pP4/1p2P3/3N1Q1p/PPPBBPPP/RN2K2R w KQ c6 0 3")
-	move := Move{Piece: chessboard.King, From: index.E1, To: index.G1, IsEnPassant: false}
+	board := BoardFromFEN("r4rk1/p2pqpb1/bn2pnp1/2pP4/1p2P3/3N1Q1p/PPPBBPPP/RN2K2R w KQ c6 0 3")
+	move := Move{Piece: King, From: bitboard.IndexE1, To: bitboard.IndexG1, IsEnPassant: false}
 
-	board2 := move.MakeMove(board)
+	board2 := board.AppliedMove(move)
 
-	assert.Equal(t, board2.ZobristHash, board2.ComputeBoardHash())
+	assert.Equal(t, board2.ZobristHash, board2.Hash())
 }
 
 func TestZobrist(t *testing.T) {
-	board := chessboard.FromFEN("r4rk1/p2pqpb1/bn2pnp1/2pP4/1p2P3/3N1Q1p/PPPBBPPP/RN2K2R w KQ c6 0 3")
+	board := BoardFromFEN("r4rk1/p2pqpb1/bn2pnp1/2pP4/1p2P3/3N1Q1p/PPPBBPPP/RN2K2R w KQ c6 0 3")
 
 	for i := 0; i < 1000; i++ {
-		moves := GenerateLegalMoves(board)
-		board = moves[0].MakeMove(board)
+		moves := GenerateLegalMoves(&board)
+		board = *board.AppliedMove(moves[0])
 	}
 
-	assert.Equal(t, board.ZobristHash, board.ComputeBoardHash())
+	assert.Equal(t, board.ZobristHash, board.Hash())
 }

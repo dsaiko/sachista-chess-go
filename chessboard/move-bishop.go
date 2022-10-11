@@ -1,10 +1,7 @@
-package generator
+package chessboard
 
 import (
 	"saiko.cz/sachista/bitboard"
-	"saiko.cz/sachista/chessboard"
-	"saiko.cz/sachista/constants"
-	"saiko.cz/sachista/index"
 )
 
 var bishopMagicA8H1 = [...]bitboard.Board{
@@ -43,27 +40,27 @@ var bishopMagicA1H8 = [...]bitboard.Board{
 	0x0,
 }
 
-var bishopA1H8Index [constants.NumberOfSquares]int
-var bishopA8H1Index [constants.NumberOfSquares]int
+var bishopA1H8Index [bitboard.NumberOfSquares]int
+var bishopA8H1Index [bitboard.NumberOfSquares]int
 
-var bishopMoveA1H8Mask [constants.NumberOfSquares]bitboard.Board
-var bishopMoveA1H8Magic [constants.NumberOfSquares]bitboard.Board
-var bishopMoveA8H1Mask [constants.NumberOfSquares]bitboard.Board
-var bishopMoveA8H1Magic [constants.NumberOfSquares]bitboard.Board
+var bishopMoveA1H8Mask [bitboard.NumberOfSquares]bitboard.Board
+var bishopMoveA1H8Magic [bitboard.NumberOfSquares]bitboard.Board
+var bishopMoveA8H1Mask [bitboard.NumberOfSquares]bitboard.Board
+var bishopMoveA8H1Magic [bitboard.NumberOfSquares]bitboard.Board
 
-var bishopMoveA1H8Attacks [constants.NumberOfSquares][constants.NumberOfSquares]bitboard.Board
-var bishopMoveA8H1Attacks [constants.NumberOfSquares][constants.NumberOfSquares]bitboard.Board
+var bishopMoveA1H8Attacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
+var bishopMoveA8H1Attacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
 
 func init() {
 	// for all fields
-	for i := 0; i < constants.NumberOfSquares; i++ {
+	for i := 0; i < bitboard.NumberOfSquares; i++ {
 		// compute index of diagonal for the field
-		bishopA8H1Index[i] = index.Index(i).FileIndex() + index.Index(i).RankIndex()%8
-		bishopA1H8Index[i] = index.Index(i).FileIndex() + 7 - index.Index(i).RankIndex()%8
+		bishopA8H1Index[i] = bitboard.Index(i).File() + bitboard.Index(i).Rank()%8
+		bishopA1H8Index[i] = bitboard.Index(i).File() + 7 - bitboard.Index(i).Rank()%8
 
 		// compute 6-bit diagonal for the field
-		bishopMoveA8H1Mask[i] = bitboard.A8H1[bishopA8H1Index[i]] & ^bitboard.Frame
-		bishopMoveA1H8Mask[i] = bitboard.A1H8[bishopA1H8Index[i]] & ^bitboard.Frame
+		bishopMoveA8H1Mask[i] = bitboard.BoardA8H1[bishopA8H1Index[i]] & ^bitboard.BoardFrame
+		bishopMoveA1H8Mask[i] = bitboard.BoardA1H8[bishopA1H8Index[i]] & ^bitboard.BoardFrame
 
 		// index magic multiplier for the field
 		bishopMoveA8H1Magic[i] = bishopMagicA8H1[bishopA8H1Index[i]]
@@ -75,26 +72,26 @@ func init() {
 	// n is 6 bit configuration
 
 	// for all fields
-	for i := 0; i < constants.NumberOfSquares; i++ {
+	for i := 0; i < bitboard.NumberOfSquares; i++ {
 		// for all possible diagonal states
-		for n := 0; n < constants.NumberOfSquares; n++ {
+		for n := 0; n < bitboard.NumberOfSquares; n++ {
 			// get the diagonal
-			diagonal := bitboard.A1H8[bishopA1H8Index[i]]
+			diagonal := bitboard.BoardA1H8[bishopA1H8Index[i]]
 
 			// reconstruct the state (number) into the diagonal
 
 			// get the left/bottom bit - start of diagonal
-			for diagonal.OneSouthWest() != bitboard.Empty {
-				diagonal = diagonal.OneSouthWest()
+			for diagonal.ShiftedOneSouthWest() != bitboard.EmptyBoard {
+				diagonal = diagonal.ShiftedOneSouthWest()
 			}
 
-			board := bitboard.Empty
+			board := bitboard.EmptyBoard
 
 			m := n
 			// traverse diagonal and set bits according to N
-			for diagonal != bitboard.Empty {
+			for diagonal != bitboard.EmptyBoard {
 				// shift up by one
-				diagonal = diagonal.OneNorthEast()
+				diagonal = diagonal.ShiftedOneNorthEast()
 				if (m & 1) != 0 {
 					board |= diagonal
 				}
@@ -102,36 +99,36 @@ func init() {
 			}
 
 			// make it 6-bit only
-			board &= ^bitboard.Frame
+			board &= ^bitboard.BoardFrame
 
 			// compute possible moves
-			moves := bitboard.Empty
+			moves := bitboard.EmptyBoard
 
 			// set piece to Ith index
-			piece := bitboard.FromIndex1(index.Index(i))
+			piece := bitboard.BoardFromIndex(bitboard.Index(i))
 
 			// move in one direction
-			for piece != bitboard.Empty {
-				piece = piece.OneNorthEast()
+			for piece != bitboard.EmptyBoard {
+				piece = piece.ShiftedOneNorthEast()
 				moves |= piece
 
 				// end when there is another piece (either color, own color will have to be stripped out)
 				if (piece & board) != 0 {
-					piece = bitboard.Empty
+					piece = bitboard.EmptyBoard
 				}
 			}
 
 			// set piece back to Ith index
-			piece = bitboard.FromIndex1(index.Index(i))
+			piece = bitboard.BoardFromIndex(bitboard.Index(i))
 
 			// move in the other direction
-			for piece != bitboard.Empty {
-				piece = piece.OneSouthWest()
+			for piece != bitboard.EmptyBoard {
+				piece = piece.ShiftedOneSouthWest()
 				moves |= piece
 
 				// end when there is another piece (either color, own color will have to be stripped out)
 				if (piece & board) != 0 {
-					piece = bitboard.Empty
+					piece = bitboard.EmptyBoard
 				}
 			}
 
@@ -144,24 +141,24 @@ func init() {
 	// i is field index
 	// n is 6 bit configuration
 	// for all fields
-	for i := 0; i < constants.NumberOfSquares; i++ {
+	for i := 0; i < bitboard.NumberOfSquares; i++ {
 		// for all possible diagonal states
-		for n := 0; n < constants.NumberOfSquares; n++ {
+		for n := 0; n < bitboard.NumberOfSquares; n++ {
 			// get the diagonal
-			diagonal := bitboard.A8H1[bishopA8H1Index[i]]
+			diagonal := bitboard.BoardA8H1[bishopA8H1Index[i]]
 
 			// get the left/top bit - start of the diagonal
-			for diagonal.OneNorthWest() != bitboard.Empty {
-				diagonal = diagonal.OneNorthWest()
+			for diagonal.ShiftedOneNorthWest() != bitboard.EmptyBoard {
+				diagonal = diagonal.ShiftedOneNorthWest()
 			}
 
 			// traverse diagonal and set bits according to N
-			board := bitboard.Empty
+			board := bitboard.EmptyBoard
 
 			m := n
-			for diagonal != bitboard.Empty {
+			for diagonal != bitboard.EmptyBoard {
 				// shift down by one
-				diagonal = diagonal.OneSouthEast()
+				diagonal = diagonal.ShiftedOneSouthEast()
 				if (m & 1) != 0 {
 					board |= diagonal
 				}
@@ -169,17 +166,17 @@ func init() {
 			}
 
 			// make it 6-bit only
-			board &= ^bitboard.Frame
+			board &= ^bitboard.BoardFrame
 
 			// pre-compute moves
-			moves := bitboard.Empty
+			moves := bitboard.EmptyBoard
 
 			// set the piece to Ith position
-			piece := bitboard.FromIndex1(index.Index(i))
+			piece := bitboard.BoardFromIndex(bitboard.Index(i))
 
 			// move one direction
-			for piece != bitboard.Empty {
-				piece = piece.OneNorthWest()
+			for piece != bitboard.EmptyBoard {
+				piece = piece.ShiftedOneNorthWest()
 				moves |= piece
 				// end when there is another piece (either color, own color will have to be stripped out)
 				if (piece & board) != 0 {
@@ -188,11 +185,11 @@ func init() {
 			}
 
 			// set the piece back to Ith position
-			piece = bitboard.FromIndex1(index.Index(i))
+			piece = bitboard.BoardFromIndex(bitboard.Index(i))
 
 			// move the other direction
-			for piece != bitboard.Empty {
-				piece = piece.OneSouthEast()
+			for piece != bitboard.EmptyBoard {
+				piece = piece.ShiftedOneSouthEast()
 				moves |= piece
 				// end when there is another piece (either color, own color will have to be stripped out)
 				if (piece & board) != 0 {
@@ -204,7 +201,7 @@ func init() {
 	}
 }
 
-func oneBishopAttacks(sourceIndex int, allPieces bitboard.Board) bitboard.Board {
+func oneBishopAttacks(sourceIndex bitboard.Index, allPieces bitboard.Board) bitboard.Board {
 	stateIndexA8H1 := ((allPieces & bishopMoveA8H1Mask[sourceIndex]) * bishopMoveA8H1Magic[sourceIndex]) >> 57
 	stateIndexA1H8 := ((allPieces & bishopMoveA1H8Mask[sourceIndex]) * bishopMoveA1H8Magic[sourceIndex]) >> 57
 
@@ -212,41 +209,45 @@ func oneBishopAttacks(sourceIndex int, allPieces bitboard.Board) bitboard.Board 
 	return bishopMoveA8H1Attacks[sourceIndex][stateIndexA8H1] | bishopMoveA1H8Attacks[sourceIndex][stateIndexA1H8]
 }
 
-func bishopAttacks(board chessboard.Board, color chessboard.Color) bitboard.Board {
-	pieces := board.Pieces[color][chessboard.Bishop] | board.Pieces[color][chessboard.Queen]
-	attacks := bitboard.Empty
+func bishopAttacks(board *Board, color Color) bitboard.Board {
+	pieces := board.Pieces[color][Bishop] | board.Pieces[color][Queen]
+	attacks := bitboard.EmptyBoard
 
 	// for all rooks
-	allPieces := board.BoardOfAllPieces()
-	for pieces != bitboard.Empty {
-		attacks |= oneBishopAttacks(pieces.BitPop(), allPieces)
+	allPieces := board.AllPieces()
+	var i bitboard.Index
+	for pieces != bitboard.EmptyBoard {
+		i, pieces = pieces.BitPop()
+		attacks |= oneBishopAttacks(i, allPieces)
 	}
 	return attacks
 }
 
-func bishopMoves(board chessboard.Board, handler MoveHandler) {
-	movingPiece := chessboard.Bishop
+func bishopMoves(board *Board, handler MoveHandler) {
+	movingPiece := Bishop
 	bishop := board.Pieces[board.NextMove][movingPiece]
 
-	allPieces := board.BoardOfAllPieces()
+	allPieces := board.AllPieces()
 	boardAvailable := board.BoardAvailableToAttack()
+
+	var fromIndex, toIndex bitboard.Index
 
 	for i := 0; i < 2; i++ { // bishops and queens
 		// for all rooks
-		for bishop != bitboard.Empty {
+		for bishop != bitboard.EmptyBoard {
 			// get next rook
-			fromIndex := bishop.BitPop()
 
+			fromIndex, bishop = bishop.BitPop()
 			movesBoard := oneBishopAttacks(fromIndex, allPieces) & boardAvailable
 
 			// for all moves
-			for movesBoard != bitboard.Empty {
-				toIndex := movesBoard.BitPop()
-				handler(Move{Piece: movingPiece, From: index.Index(fromIndex), To: index.Index(toIndex)})
+			for movesBoard != bitboard.EmptyBoard {
+				toIndex, movesBoard = movesBoard.BitPop()
+				handler(Move{Piece: movingPiece, From: fromIndex, To: toIndex})
 			}
 		}
 		// switch to queen
-		movingPiece = chessboard.Queen
+		movingPiece = Queen
 		bishop = board.Pieces[board.NextMove][movingPiece]
 	}
 }

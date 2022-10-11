@@ -6,31 +6,30 @@ import (
 	"strconv"
 
 	"saiko.cz/sachista/bitboard"
-	"saiko.cz/sachista/constants"
 )
 
 // String representation of the board plane
 // Does not keep castling or enPassant info
-func (b Board) String() string {
+func (b *Board) String() string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString(bitboard.BoardHeader)
 
-	whiteKing := b.Pieces[White][King].MirrorVertical()
-	whiteQueen := b.Pieces[White][Queen].MirrorVertical()
-	whiteRook := b.Pieces[White][Rook].MirrorVertical()
-	whiteKnight := b.Pieces[White][Knight].MirrorVertical()
-	whiteBishop := b.Pieces[White][Bishop].MirrorVertical()
-	whitePawn := b.Pieces[White][Pawn].MirrorVertical()
-	blackKing := b.Pieces[Black][King].MirrorVertical()
-	blackQueen := b.Pieces[Black][Queen].MirrorVertical()
-	blackRook := b.Pieces[Black][Rook].MirrorVertical()
-	blackKnight := b.Pieces[Black][Knight].MirrorVertical()
-	blackBishop := b.Pieces[Black][Bishop].MirrorVertical()
-	blackPawn := b.Pieces[Black][Pawn].MirrorVertical()
+	whiteKing := b.Pieces[White][King].MirroredVertical()
+	whiteQueen := b.Pieces[White][Queen].MirroredVertical()
+	whiteRook := b.Pieces[White][Rook].MirroredVertical()
+	whiteKnight := b.Pieces[White][Knight].MirroredVertical()
+	whiteBishop := b.Pieces[White][Bishop].MirroredVertical()
+	whitePawn := b.Pieces[White][Pawn].MirroredVertical()
+	blackKing := b.Pieces[Black][King].MirroredVertical()
+	blackQueen := b.Pieces[Black][Queen].MirroredVertical()
+	blackRook := b.Pieces[Black][Rook].MirroredVertical()
+	blackKnight := b.Pieces[Black][Knight].MirroredVertical()
+	blackBishop := b.Pieces[Black][Bishop].MirroredVertical()
+	blackPawn := b.Pieces[Black][Pawn].MirroredVertical()
 
 	// print all 64 Pieces
-	for i := 0; i < constants.NumberOfSquares; i++ {
+	for i := 0; i < bitboard.NumberOfSquares; i++ {
 		if (i % 8) == 0 {
 			if i > 0 {
 				buffer.WriteString(strconv.Itoa(9 - (i / 8)))
@@ -104,5 +103,5 @@ func FromString(str string) Board {
 	}
 	fen += " w KQkq - 0 1"
 
-	return FromFEN(fen)
+	return BoardFromFEN(fen)
 }

@@ -1,20 +1,19 @@
-package generator
+package chessboard
 
 import (
 	"bytes"
-	"saiko.cz/sachista/chessboard"
-	"saiko.cz/sachista/index"
+	"saiko.cz/sachista/bitboard"
 )
 
 type MoveHandler func(Move)
 
 type Move struct {
-	Piece chessboard.Piece
-	From  index.Index
-	To    index.Index
+	Piece Piece
+	From  bitboard.Index
+	To    bitboard.Index
 
 	IsEnPassant    bool
-	PromotionPiece chessboard.Piece
+	PromotionPiece Piece
 }
 
 // String move notation
@@ -25,7 +24,7 @@ func (m Move) String() string {
 	buffer.WriteString(m.To.String())
 
 	if m.PromotionPiece > 0 { // this excludes NoPiece and King
-		buffer.WriteString(m.PromotionPiece.String(chessboard.Black))
+		buffer.WriteString(m.PromotionPiece.String(Black))
 	}
 
 	return buffer.String()

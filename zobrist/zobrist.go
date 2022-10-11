@@ -19,16 +19,15 @@ package zobrist
 import (
 	"crypto/rand"
 	"encoding/binary"
-
-	"saiko.cz/sachista/constants"
+	"saiko.cz/sachista/bitboard"
 )
 
 // Keys for Zobrist checksum of the board
 // Hash does not include move clocks
 type Keys struct {
-	Pieces    [constants.NumberOfColors][constants.NumberOfPieces + 1][constants.NumberOfSquares]uint64
-	Castling  [constants.NumberOfColors][constants.NumberOfCastlingOptions]uint64
-	EnPassant [constants.NumberOfSquares]uint64
+	Pieces    [bitboard.NumberOfColors][bitboard.NumberOfPieces + 1][bitboard.NumberOfSquares]uint64
+	Castling  [bitboard.NumberOfColors][bitboard.NumberOfCastlingOptions]uint64
+	EnPassant [bitboard.NumberOfSquares]uint64
 	Side      uint64
 }
 
@@ -39,9 +38,9 @@ func NewKeys() *Keys {
 	// Generate random values for all unique states
 	// We do not need to seed the generator, numbers may be the same each time
 
-	for square := 0; square < constants.NumberOfSquares; square++ {
-		for side := 0; side < constants.NumberOfColors; side++ {
-			for piece := 0; piece < constants.NumberOfPieces+1; piece++ {
+	for square := 0; square < bitboard.NumberOfSquares; square++ {
+		for side := 0; side < bitboard.NumberOfColors; side++ {
+			for piece := 0; piece < bitboard.NumberOfPieces+1; piece++ {
 				z.Pieces[side][piece][square] = randUInt64()
 			}
 		}

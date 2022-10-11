@@ -5,40 +5,38 @@ import (
 	"strconv"
 
 	"saiko.cz/sachista/bitboard"
-	"saiko.cz/sachista/constants"
-	"saiko.cz/sachista/index"
 )
 
 // ToFEN converts board to FEN notation string
-func (b Board) ToFEN() string {
+func (b *Board) ToFEN() string {
 
 	var buffer bytes.Buffer
 
-	whiteKing := b.Pieces[White][King].MirrorVertical()
-	whiteQueen := b.Pieces[White][Queen].MirrorVertical()
-	whiteRook := b.Pieces[White][Rook].MirrorVertical()
-	whiteKnight := b.Pieces[White][Knight].MirrorVertical()
-	whiteBishop := b.Pieces[White][Bishop].MirrorVertical()
-	whitePawn := b.Pieces[White][Pawn].MirrorVertical()
-	blackKing := b.Pieces[Black][King].MirrorVertical()
-	blackQueen := b.Pieces[Black][Queen].MirrorVertical()
-	blackRook := b.Pieces[Black][Rook].MirrorVertical()
-	blackKnight := b.Pieces[Black][Knight].MirrorVertical()
-	blackBishop := b.Pieces[Black][Bishop].MirrorVertical()
-	blackPawn := b.Pieces[Black][Pawn].MirrorVertical()
+	whiteKing := b.Pieces[White][King].MirroredVertical()
+	whiteQueen := b.Pieces[White][Queen].MirroredVertical()
+	whiteRook := b.Pieces[White][Rook].MirroredVertical()
+	whiteKnight := b.Pieces[White][Knight].MirroredVertical()
+	whiteBishop := b.Pieces[White][Bishop].MirroredVertical()
+	whitePawn := b.Pieces[White][Pawn].MirroredVertical()
+	blackKing := b.Pieces[Black][King].MirroredVertical()
+	blackQueen := b.Pieces[Black][Queen].MirroredVertical()
+	blackRook := b.Pieces[Black][Rook].MirroredVertical()
+	blackKnight := b.Pieces[Black][Knight].MirroredVertical()
+	blackBishop := b.Pieces[Black][Bishop].MirroredVertical()
+	blackPawn := b.Pieces[Black][Pawn].MirroredVertical()
 
 	spaces := 0
 
-	outputCount := func() {
+	outputSpaces := func(spaces int) int {
 		if spaces > 0 {
 			buffer.WriteString(strconv.Itoa(spaces))
-			spaces = 0
 		}
+		return 0
 	}
 
-	for i := 0; i < constants.NumberOfSquares; i++ {
+	for i := 0; i < bitboard.NumberOfSquares; i++ {
 		if (i % 8) == 0 {
-			outputCount()
+			spaces = outputSpaces(spaces)
 			if i > 0 {
 				buffer.WriteString("/")
 			}
@@ -75,13 +73,13 @@ func (b Board) ToFEN() string {
 		}
 
 		if len(c) != 0 {
-			outputCount()
+			spaces = outputSpaces(spaces)
 			buffer.WriteString(c)
 		} else {
 			spaces++
 		}
 	}
-	outputCount()
+	spaces = outputSpaces(spaces)
 
 	// next move color
 	buffer.WriteString(" ")
@@ -122,9 +120,9 @@ func (b Board) ToFEN() string {
 	return buffer.String()
 }
 
-// FromFEN converts FEN string to board object
-func FromFEN(fen string) Board {
-	b := Empty()
+// BoardFromFEN converts FEN string to board object
+func BoardFromFEN(fen string) Board {
+	b := EmptyBoard()
 	i := 0
 	fenLength := len(fen)
 
@@ -175,7 +173,7 @@ func FromFEN(fen string) Board {
 	// need to mirror the boards
 	for color := White; color <= Black; color++ {
 		for piece := King; piece <= Pawn; piece++ {
-			b.Pieces[color][piece] = b.Pieces[color][piece].MirrorHorizontal()
+			b.Pieces[color][piece] = b.Pieces[color][piece].MirroredHorizontal()
 		}
 	}
 
@@ -222,7 +220,7 @@ func FromFEN(fen string) Board {
 		}
 
 		if len(notation) == 2 {
-			b.EnPassantTarget = index.FromNotation(notation)
+			b.EnPassantTarget = bitboard.IndexFromNotation(notation)
 		}
 	}
 
@@ -260,27 +258,27 @@ func FromFEN(fen string) Board {
 	}
 
 	// fix castling
-	if (b.Pieces[White][Rook] & bitboard.A1) == 0 {
-		b.RemoveCastling(White, CastlingQueenSide)
+	if (b.Pieces[White][Rook] & bitboard.BoardA1) == 0 {
+		b.RemovedCastling(White, CastlingQueenSide)
 	}
-	if (b.Pieces[White][Rook] & bitboard.H1) == 0 {
-		b.RemoveCastling(White, CastlingKingSide)
+	if (b.Pieces[White][Rook] & bitboard.BoardH1) == 0 {
+		b.RemovedCastling(White, CastlingKingSide)
 	}
-	if (b.Pieces[Black][Rook] & bitboard.A8) == 0 {
-		b.RemoveCastling(Black, CastlingQueenSide)
+	if (b.Pieces[Black][Rook] & bitboard.BoardA8) == 0 {
+		b.RemovedCastling(Black, CastlingQueenSide)
 	}
-	if (b.Pieces[Black][Rook] & bitboard.H8) == 0 {
-		b.RemoveCastling(Black, CastlingKingSide)
+	if (b.Pieces[Black][Rook] & bitboard.BoardH8) == 0 {
+		b.RemovedCastling(Black, CastlingKingSide)
 	}
 
 	// if king is misplaced, remove castling availability
-	if (b.Pieces[White][King] & bitboard.E1) == 0 {
+	if (b.Pieces[White][King] & bitboard.BoardE1) == 0 {
 		b.Castling[White] = CastlingNone
 	}
-	if (b.Pieces[Black][King] & bitboard.E8) == 0 {
+	if (b.Pieces[Black][King] & bitboard.BoardE8) == 0 {
 		b.Castling[Black] = CastlingNone
 	}
 
-	b.ZobristHash = b.ComputeBoardHash()
+	b.ZobristHash = b.Hash()
 	return b
 }
