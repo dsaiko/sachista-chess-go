@@ -1,8 +1,6 @@
 package chessboard
 
 import (
-	"sync"
-
 	"saiko.cz/sachista/bitboard"
 )
 
@@ -91,26 +89,19 @@ func PerfT(b *Board, depth int) uint64 {
 	}
 
 	results := make(chan uint64, len(moves))
-	var wg sync.WaitGroup
 
 	// for each legal move, create a goroutine
 	for _, m := range moves {
-		wg.Add(1)
 		go func(b *Board) {
-			defer wg.Done()
 			cache := &PerfTCache{}
 			results <- perfT1(cache, b, depth-1)
 		}(b.AppliedMove(m))
 	}
 
-	// wait for all and close results
-	wg.Wait()
-	close(results)
-
 	// count results
 	count := uint64(0)
-	for res := range results {
-		count += res
+	for i := 0; i < len(moves); i++ {
+		count += <-results
 	}
 
 	return count
