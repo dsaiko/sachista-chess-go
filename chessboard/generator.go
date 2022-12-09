@@ -43,7 +43,7 @@ func GenerateLegalMoves(b *Board) []Move {
 	legalMoves := make([]Move, 0, MovesCacheInitialCapacity)
 
 	generatePseudoLegalMoves(b, func(m Move) {
-		if isOpponentsKingNotUnderCheck(b.AppliedMove(m)) {
+		if isOpponentsKingNotUnderCheck(m.ApplyTo(*b)) {
 			legalMoves = append(legalMoves, m)
 		}
 	})

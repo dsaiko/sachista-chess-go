@@ -4,14 +4,9 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
-func (b *Board) AppliedMove(m Move) *Board {
+func (m *Move) ApplyTo(board Board) *Board {
 	sourceIndex := m.From
 	targetIndex := m.To
-	board := *b
-
-	if sourceIndex == targetIndex {
-		return &board
-	}
 
 	sourceBitBoard := bitboard.BoardFromIndex(sourceIndex)
 	targetBitBoard := bitboard.BoardFromIndex(targetIndex)
