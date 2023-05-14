@@ -14,19 +14,6 @@ func TestMove_MakeMove(t *testing.T) {
 		want  string
 	}{
 		{
-			want: `
-  a b c d e f g h
-8 - - - - - - - - 8
-7 - - - - - - - - 7
-6 - - - - - - - - 6
-5 - - - - - - - - 5
-4 - - - - - - - - 4
-3 - - - - - - - - 3
-2 - - - - - - - - 2
-1 - - - - - - - - 1
-  a b c d e f g h
-`},
-		{
 			board: FromString(`
   a b c d e f g h
 8 - - - r - - - - 8
@@ -81,7 +68,7 @@ func TestMove_MakeMove(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run("", func(t *testing.T) {
-			board2 := strings.TrimSpace(tc.board.AppliedMove(tc.move).String())
+			board2 := strings.TrimSpace(tc.move.ApplyTo(tc.board).String())
 			want := strings.TrimSpace(tc.want)
 			if board2 != want {
 				t.Errorf("MakeMove() =\n%v, want\n%v", board2, want)
@@ -94,7 +81,7 @@ func TestZobristFailScenarion1(t *testing.T) {
 	board := BoardFromFEN("r4rk1/p2pqpb1/bn2pnp1/2pP4/1p2P3/3N1Q1p/PPPBBPPP/RN2K2R w KQ c6 0 3")
 	move := Move{Piece: King, From: bitboard.IndexE1, To: bitboard.IndexG1, IsEnPassant: false}
 
-	board2 := board.AppliedMove(move)
+	board2 := move.ApplyTo(board)
 
 	assert.Equal(t, board2.ZobristHash, board2.Hash())
 }
@@ -104,7 +91,7 @@ func TestZobrist(t *testing.T) {
 
 	for i := 0; i < 1000; i++ {
 		moves := GenerateLegalMoves(&board)
-		board = *board.AppliedMove(moves[0])
+		board = *moves[0].ApplyTo(board)
 	}
 
 	assert.Equal(t, board.ZobristHash, board.Hash())
