@@ -10,8 +10,8 @@ func init() {
 	for i := 0; i < bitboard.NumberOfSquares; i++ {
 		piece := bitboard.BoardFromIndex(bitboard.Index(i))
 
-		pawnAttacksCache[White][i] = piece.Shifted(1, 1) | piece.Shifted(-1, 1)
-		pawnAttacksCache[Black][i] = piece.Shifted(1, -1) | piece.Shifted(-1, -1)
+		pawnAttacksCache[White][i] = piece.ShiftedOneNorthEast() | piece.ShiftedOneNorthWest()
+		pawnAttacksCache[Black][i] = piece.ShiftedOneSouthEast() | piece.ShiftedOneSouthWest()
 	}
 }
 
@@ -31,19 +31,20 @@ func pawnMoves(board *Board, handler MoveHandler) {
 
 	for pawns != bitboard.EmptyBoard {
 		fromIndex, pawns = pawns.BitPop()
+		fromBitBoard := bitboard.BoardFromIndex(fromIndex)
 
-		// get possible moves - moves minus my onw color
+		// get possible moves - moves minus my own color
 		// one step forward
 		var movesBoard bitboard.Board
 		switch board.NextMove {
 		case White:
-			movesBoard = bitboard.BoardFromIndex(fromIndex).ShiftedOneNorth() & emptyBoard
+			movesBoard = fromBitBoard.ShiftedOneNorth() & emptyBoard
 			if fromIndex < bitboard.IndexA3 {
 				// double move
 				movesBoard |= movesBoard.ShiftedOneNorth() & emptyBoard
 			}
 		case Black:
-			movesBoard = bitboard.BoardFromIndex(fromIndex).ShiftedOneSouth() & emptyBoard
+			movesBoard = fromBitBoard.ShiftedOneSouth() & emptyBoard
 			if fromIndex > bitboard.IndexH6 {
 				// double move
 				movesBoard |= movesBoard.ShiftedOneSouth() & emptyBoard
@@ -51,7 +52,15 @@ func pawnMoves(board *Board, handler MoveHandler) {
 		}
 
 		// get attacks, only against opponent pieces
-		attacks := pawnAttacksCache[board.NextMove][fromIndex]
+		var attacks bitboard.Board
+		switch board.NextMove {
+		case White:
+			attacks = fromBitBoard.ShiftedOneNorthEast() | fromBitBoard.ShiftedOneNorthWest()
+		default:
+			attacks = fromBitBoard.ShiftedOneSouthEast() | fromBitBoard.ShiftedOneSouthWest()
+		}
+
+		//attacks := pawnAttacksCache[board.NextMove][fromIndex]
 		movesBoard |= attacks & board.OpponentPieces()
 
 		// for all moves

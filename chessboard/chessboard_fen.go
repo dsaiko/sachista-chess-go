@@ -79,7 +79,7 @@ func (b *Board) ToFEN() string {
 			spaces++
 		}
 	}
-	spaces = outputSpaces(spaces)
+	_ = outputSpaces(spaces)
 
 	// next move color
 	buffer.WriteString(" ")
