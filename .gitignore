@@ -2,3 +2,5 @@
 bin
 /cpu.prof
 /mem.prof
+.vscode
+

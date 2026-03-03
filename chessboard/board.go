@@ -11,13 +11,14 @@ var ZobristKeys = zobrist.NewKeys()
 const StandardBoardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
 type Board struct {
+	Pieces          [bitboard.NumberOfColors][bitboard.NumberOfPieces]bitboard.Board
+	Occupied        [bitboard.NumberOfColors]bitboard.Board // cached PiecesByColor
+	ZobristHash     uint64
 	NextMove        Color
 	Castling        [bitboard.NumberOfColors]Castling
-	Pieces          [bitboard.NumberOfColors][bitboard.NumberOfPieces]bitboard.Board
+	EnPassantTarget bitboard.Index
 	HalfMoveClock   int
 	FullMoveNumber  int
-	EnPassantTarget bitboard.Index
-	ZobristHash     uint64
 }
 
 type Color int
@@ -40,25 +41,33 @@ func (c Color) String() string {
 
 // PiecesByColor bitboard of all pieces of one color
 func (b *Board) PiecesByColor(color Color) bitboard.Board {
-	return b.Pieces[color][Queen] |
-		b.Pieces[color][King] |
-		b.Pieces[color][Rook] |
-		b.Pieces[color][Bishop] |
-		b.Pieces[color][Knight] |
-		b.Pieces[color][Pawn]
+	return b.Occupied[color]
 }
 
 // AllPieces bitboard of all pieces
 func (b *Board) AllPieces() bitboard.Board {
-	return b.PiecesByColor(White) | b.PiecesByColor(Black)
+	return b.Occupied[White] | b.Occupied[Black]
 }
 
-// OpponentColor ...
+// RecomputeOccupied recomputes the cached Occupied bitboards from Pieces
+func (b *Board) RecomputeOccupied() {
+	b.Occupied[White] = b.Pieces[White][Queen] |
+		b.Pieces[White][King] |
+		b.Pieces[White][Rook] |
+		b.Pieces[White][Bishop] |
+		b.Pieces[White][Knight] |
+		b.Pieces[White][Pawn]
+	b.Occupied[Black] = b.Pieces[Black][Queen] |
+		b.Pieces[Black][King] |
+		b.Pieces[Black][Rook] |
+		b.Pieces[Black][Bishop] |
+		b.Pieces[Black][Knight] |
+		b.Pieces[Black][Pawn]
+}
+
+// OpponentColor returns the opposite color using branchless XOR
 func (b *Board) OpponentColor() Color {
-	if b.NextMove == White {
-		return Black
-	}
-	return White
+	return 1 ^ b.NextMove
 }
 
 // MyPieces ...
@@ -151,6 +160,7 @@ func StandardBoard() Board {
 	b.Castling[White] = CastlingBothSides
 	b.Castling[Black] = CastlingBothSides
 
+	b.RecomputeOccupied()
 	b.ZobristHash = b.Hash()
 	return b
 }

@@ -4,7 +4,7 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
-func (m *Move) ApplyTo(board Board) *Board {
+func (m *Move) ApplyTo(board Board) Board {
 	sourceIndex := m.From
 	targetIndex := m.To
 
@@ -94,22 +94,11 @@ func (m *Move) ApplyTo(board Board) *Board {
 		}
 	}
 
-	isCapture := targetBitBoard&board.OpponentPieces() != 0
+	isCapture := targetBitBoard&board.Occupied[opponentColor] != 0
 	if isCapture || m.IsEnPassant {
-		// check capture
 		board.HalfMoveClock = 0
 
-		checkCapture := func(piece Piece) bool {
-			if board.Pieces[opponentColor][piece]&targetBitBoard != 0 {
-				board.Pieces[opponentColor][piece] ^= targetBitBoard
-				board.ZobristHash ^= ZobristKeys.Pieces[opponentColor][piece][targetIndex]
-				return true
-			}
-			return false
-		}
-
-		switch {
-		case m.IsEnPassant:
+		if m.IsEnPassant {
 			if board.NextMove == White {
 				board.Pieces[Black][Pawn] ^= targetBitBoard.ShiftedOneSouth()
 				board.ZobristHash ^= ZobristKeys.Pieces[Black][Pawn][targetIndex-8]
@@ -117,24 +106,30 @@ func (m *Move) ApplyTo(board Board) *Board {
 				board.Pieces[White][Pawn] ^= targetBitBoard.ShiftedOneNorth()
 				board.ZobristHash ^= ZobristKeys.Pieces[White][Pawn][targetIndex+8]
 			}
-		case checkCapture(Bishop):
-		case checkCapture(Knight):
-		case checkCapture(Pawn):
-		case checkCapture(Queen):
-		case checkCapture(Rook):
-			if board.NextMove == White {
-				switch targetIndex {
-				case bitboard.IndexA8:
-					board.RemovedCastling(Black, CastlingQueenSide)
-				case bitboard.IndexH8:
-					board.RemovedCastling(Black, CastlingKingSide)
-				}
-			} else {
-				switch targetIndex {
-				case bitboard.IndexA1:
-					board.RemovedCastling(White, CastlingQueenSide)
-				case bitboard.IndexH1:
-					board.RemovedCastling(White, CastlingKingSide)
+		} else {
+			// Find and remove captured piece
+			for piece := range bitboard.NumberOfPieces {
+				if board.Pieces[opponentColor][piece]&targetBitBoard != 0 {
+					board.Pieces[opponentColor][piece] ^= targetBitBoard
+					board.ZobristHash ^= ZobristKeys.Pieces[opponentColor][piece][targetIndex]
+					if Piece(piece) == Rook {
+						if board.NextMove == White {
+							switch targetIndex {
+							case bitboard.IndexA8:
+								board.RemovedCastling(Black, CastlingQueenSide)
+							case bitboard.IndexH8:
+								board.RemovedCastling(Black, CastlingKingSide)
+							}
+						} else {
+							switch targetIndex {
+							case bitboard.IndexA1:
+								board.RemovedCastling(White, CastlingQueenSide)
+							case bitboard.IndexH1:
+								board.RemovedCastling(White, CastlingKingSide)
+							}
+						}
+					}
+					break
 				}
 			}
 		}
@@ -160,7 +155,8 @@ func (m *Move) ApplyTo(board Board) *Board {
 		board.ZobristHash ^= ZobristKeys.EnPassant[board.EnPassantTarget]
 	}
 
-	return &board
+	board.RecomputeOccupied()
+	return board
 }
 
 func absInt(x int) int {

@@ -1,45 +1,52 @@
 package chessboard
 
 import (
-	"sync/atomic"
-
 	"saiko.cz/sachista/bitboard"
 )
 
-// PerfTCacheEntry cache record structure
-type PerfTCacheEntry struct {
-	hash  uint64
-	depth int
-	count uint64
-}
-
 const CacheSize = 64 * 1024 * 1024
 
-// PerfTCache cache for repeated moves
-type PerfTCache [CacheSize]atomic.Value
-
-// set cache item - atomic method
-func (c *PerfTCache) set(hash uint64, depth int, count uint64) {
-	c[(CacheSize-1)&hash].Store(PerfTCacheEntry{
-		hash:  hash,
-		depth: depth,
-		count: count,
-	})
+// PerfTCache uses lockless hashing (XOR trick) with two uint64 arrays.
+// On ARM64/x86-64, aligned 64-bit loads/stores are naturally atomic;
+// the XOR consistency check in get() detects any torn or stale reads.
+type PerfTCache struct {
+	keys   *[CacheSize]uint64 // stores hash XOR value (for consistency check)
+	values *[CacheSize]uint64 // stores packed (depth << 56) | count
 }
 
-// get cache item - atomic method
+func newPerfTCache() *PerfTCache {
+	return &PerfTCache{
+		keys:   new([CacheSize]uint64),
+		values: new([CacheSize]uint64),
+	}
+}
+
+// set cache item using lockless XOR trick
+func (c *PerfTCache) set(hash uint64, depth int, count uint64) {
+	idx := (CacheSize - 1) & hash
+	value := (uint64(depth) << 56) | (count & 0x00FFFFFFFFFFFFFF)
+	c.values[idx] = value
+	c.keys[idx] = hash ^ value
+}
+
+// get cache item - returns 0 on miss
 func (c *PerfTCache) get(hash uint64, depth int) uint64 {
-	entry, ok := c[(CacheSize-1)&hash].Load().(PerfTCacheEntry)
-	if !ok || entry.hash != hash || entry.depth != depth {
+	idx := (CacheSize - 1) & hash
+	value := c.values[idx]
+	key := c.keys[idx]
+	if key^value != hash {
 		return 0
 	}
-	return entry.count
+	if value>>56 != uint64(depth) {
+		return 0
+	}
+	return value & 0x00FFFFFFFFFFFFFF
 }
 
-var cache = PerfTCache{}
+var cache = newPerfTCache()
 
-// perfT1 single threaded min/max algorithm for searching the moves
-func perfT1(b *Board, depth int) uint64 {
+// perfT1 single threaded perft algorithm - takes Board by value to keep it on stack
+func perfT1(b Board, depth int) uint64 {
 	if depth <= 0 {
 		return 1
 	}
@@ -50,7 +57,7 @@ func perfT1(b *Board, depth int) uint64 {
 		return count
 	}
 
-	attacks := attacks(b, b.OpponentColor())
+	attacks := attacks(&b, b.OpponentColor())
 	isCheck := attacks&b.Pieces[b.NextMove][King] != 0
 
 	handler := func(m Move) {
@@ -61,22 +68,24 @@ func perfT1(b *Board, depth int) uint64 {
 		needToValidate := isKingMove || isCheck || sourceBitBoard&attacks != 0 || m.IsEnPassant
 
 		if depth == 1 {
-			if !needToValidate || isOpponentsKingNotUnderCheck(m.ApplyTo(*b)) {
+			if !needToValidate {
 				count++
+			} else {
+				nb := m.ApplyTo(b)
+				if isOpponentsKingNotUnderCheck(&nb) {
+					count++
+				}
 			}
 		} else {
-			nextBoard := m.ApplyTo(*b)
-			if !needToValidate || isOpponentsKingNotUnderCheck(nextBoard) {
+			nextBoard := m.ApplyTo(b)
+			if !needToValidate || isOpponentsKingNotUnderCheck(&nextBoard) {
 				count += perfT1(nextBoard, depth-1)
 			}
 		}
 	}
 
 	// generate pseudo legal moves
-	generatePseudoLegalMoves(b, handler)
-
-	// DEBUG OUTPUT FOR UTILS/PERFT-STOKFISH-CHECK.SH:
-	// fmt.Printf("%v|%v|%v\n",b.ToFEN(), depth, count)
+	generatePseudoLegalMoves(&b, handler)
 
 	cache.set(b.ZobristHash, depth, count)
 	return count
@@ -90,9 +99,10 @@ func PerfT(b *Board, depth int) uint64 {
 
 	// for each legal move, create a goroutine
 	for _, m := range moves {
-		go func(b *Board) {
+		nb := m.ApplyTo(*b)
+		go func(b Board) {
 			results <- perfT1(b, depth-1)
-		}(m.ApplyTo(*b))
+		}(nb)
 	}
 
 	// count results

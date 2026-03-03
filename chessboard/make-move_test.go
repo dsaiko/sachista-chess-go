@@ -71,7 +71,8 @@ func TestMove_MakeMove(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run("", func(t *testing.T) {
-			board2 := strings.TrimSpace(tc.move.ApplyTo(tc.board).String())
+			result := tc.move.ApplyTo(tc.board)
+			board2 := strings.TrimSpace(result.String())
 			want := strings.TrimSpace(tc.want)
 			if board2 != want {
 				t.Errorf("MakeMove() =\n%v, want\n%v", board2, want)
@@ -94,7 +95,7 @@ func TestZobrist(t *testing.T) {
 
 	for range 1000 {
 		moves := GenerateLegalMoves(&board)
-		board = *moves[0].ApplyTo(board)
+		board = moves[0].ApplyTo(board)
 	}
 
 	assert.Equal(t, board.ZobristHash, board.Hash())

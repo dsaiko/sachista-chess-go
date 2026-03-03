@@ -278,6 +278,7 @@ func BoardFromFEN(fen string) Board {
 		b.Castling[Black] = CastlingNone
 	}
 
+	b.RecomputeOccupied()
 	b.ZobristHash = b.Hash()
 	return b
 }
