@@ -19,6 +19,7 @@ package zobrist
 import (
 	"crypto/rand"
 	"encoding/binary"
+
 	"saiko.cz/sachista/bitboard"
 )
 
@@ -38,16 +39,16 @@ func NewKeys() *Keys {
 	// Generate random values for all unique states
 	// We do not need to seed the generator, numbers may be the same each time
 
-	for square := 0; square < bitboard.NumberOfSquares; square++ {
-		for side := 0; side < bitboard.NumberOfColors; side++ {
-			for piece := 0; piece < bitboard.NumberOfPieces+1; piece++ {
+	for square := range bitboard.NumberOfSquares {
+		for side := range bitboard.NumberOfColors {
+			for piece := range bitboard.NumberOfPieces + 1 {
 				z.Pieces[side][piece][square] = randUInt64()
 			}
 		}
 		z.EnPassant[square] = randUInt64()
 	}
 
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		z.Castling[0][i] = randUInt64()
 		z.Castling[1][i] = randUInt64()
 	}

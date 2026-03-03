@@ -33,30 +33,33 @@ func (m *Move) ApplyTo(board Board) *Board {
 	board.Pieces[board.NextMove][m.Piece] ^= sourceBitBoard | targetBitBoard
 	board.ZobristHash ^= ZobristKeys.Pieces[board.NextMove][m.Piece][sourceIndex] ^ ZobristKeys.Pieces[board.NextMove][m.Piece][targetIndex]
 
-	switch {
-	case m.Piece == Rook:
+	switch m.Piece {
+	case Rook:
 		if board.NextMove == White {
-			if sourceIndex == bitboard.IndexA1 {
+			switch sourceIndex {
+			case bitboard.IndexA1:
 				board.Castling[board.NextMove] &= ^CastlingQueenSide
-			} else if sourceIndex == bitboard.IndexH1 {
+			case bitboard.IndexH1:
 				board.Castling[board.NextMove] &= ^CastlingKingSide
 			}
 		} else {
-			if sourceIndex == bitboard.IndexA8 {
+			switch sourceIndex {
+			case bitboard.IndexA8:
 				board.RemovedCastling(board.NextMove, CastlingQueenSide)
-			} else if sourceIndex == bitboard.IndexH8 {
+			case bitboard.IndexH8:
 				board.RemovedCastling(board.NextMove, CastlingKingSide)
 			}
 		}
-	case m.Piece == King:
+	case King:
 		board.Castling[board.NextMove] = CastlingNone
 		if board.NextMove == White {
 			if sourceIndex == bitboard.IndexE1 {
 				// handle castling
-				if targetIndex == bitboard.IndexC1 {
+				switch targetIndex {
+				case bitboard.IndexC1:
 					board.Pieces[board.NextMove][Rook] ^= bitboard.BoardA1 | bitboard.BoardD1
 					board.ZobristHash ^= ZobristKeys.Pieces[board.NextMove][Rook][bitboard.IndexA1] ^ ZobristKeys.Pieces[board.NextMove][Rook][bitboard.IndexD1]
-				} else if targetIndex == bitboard.IndexG1 {
+				case bitboard.IndexG1:
 					board.Pieces[board.NextMove][Rook] ^= bitboard.BoardH1 | bitboard.BoardF1
 					board.ZobristHash ^= ZobristKeys.Pieces[board.NextMove][Rook][bitboard.IndexH1] ^ ZobristKeys.Pieces[board.NextMove][Rook][bitboard.IndexF1]
 				}
@@ -64,16 +67,17 @@ func (m *Move) ApplyTo(board Board) *Board {
 		} else {
 			if sourceIndex == bitboard.IndexE8 {
 				// handle castling
-				if targetIndex == bitboard.IndexC8 {
+				switch targetIndex {
+				case bitboard.IndexC8:
 					board.Pieces[board.NextMove][Rook] ^= bitboard.BoardA8 | bitboard.BoardD8
 					board.ZobristHash ^= ZobristKeys.Pieces[board.NextMove][Rook][bitboard.IndexA8] ^ ZobristKeys.Pieces[board.NextMove][Rook][bitboard.IndexD8]
-				} else if targetIndex == bitboard.IndexG8 {
+				case bitboard.IndexG8:
 					board.Pieces[board.NextMove][Rook] ^= bitboard.BoardH8 | bitboard.BoardF8
 					board.ZobristHash ^= ZobristKeys.Pieces[board.NextMove][Rook][bitboard.IndexH8] ^ ZobristKeys.Pieces[board.NextMove][Rook][bitboard.IndexF8]
 				}
 			}
 		}
-	case m.Piece == Pawn:
+	case Pawn:
 		board.HalfMoveClock = 0
 		if absInt(int(targetIndex)-int(sourceIndex)) > 10 {
 			var n bitboard.Index = 8
@@ -119,15 +123,17 @@ func (m *Move) ApplyTo(board Board) *Board {
 		case checkCapture(Queen):
 		case checkCapture(Rook):
 			if board.NextMove == White {
-				if targetIndex == bitboard.IndexA8 {
+				switch targetIndex {
+				case bitboard.IndexA8:
 					board.RemovedCastling(Black, CastlingQueenSide)
-				} else if targetIndex == bitboard.IndexH8 {
+				case bitboard.IndexH8:
 					board.RemovedCastling(Black, CastlingKingSide)
 				}
 			} else {
-				if targetIndex == bitboard.IndexA1 {
+				switch targetIndex {
+				case bitboard.IndexA1:
 					board.RemovedCastling(White, CastlingQueenSide)
-				} else if targetIndex == bitboard.IndexH1 {
+				case bitboard.IndexH1:
 					board.RemovedCastling(White, CastlingKingSide)
 				}
 			}

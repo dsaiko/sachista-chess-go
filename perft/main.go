@@ -2,18 +2,17 @@ package main
 
 import (
 	"log"
+	"math"
 	"os"
 	"runtime"
 	"strconv"
 	"time"
 
 	"github.com/dustin/go-humanize"
-
 	"saiko.cz/sachista/chessboard"
 )
 
 func main() {
-
 	logger := NewLogger()
 
 	logger.info.Printf("Welcome to sachista-chess-go %v perfT!\n\n", runtime.GOARCH)
@@ -42,10 +41,15 @@ func main() {
 	result := chessboard.PerfT(&board, depth)
 	duration := time.Since(start)
 
+	count := strconv.FormatUint(result, 10)
+	if result <= math.MaxInt64 {
+		count = humanize.Comma(int64(result))
+	}
+
 	logger.info.Println("perfT finished:")
 	logger.info.Println("   FEN:   ", board.ToFEN())
 	logger.info.Println("   depth: ", depth)
-	logger.info.Println("   count: ", humanize.Comma(int64(result)))
+	logger.info.Println("   count: ", count)
 	logger.info.Println("   time:  ", duration)
 }
 

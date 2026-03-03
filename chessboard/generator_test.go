@@ -1,10 +1,10 @@
 package chessboard
 
 import (
-	"saiko.cz/sachista/bitboard"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"saiko.cz/sachista/bitboard"
 )
 
 func TestMove_String(t *testing.T) {
@@ -16,25 +16,22 @@ func TestMove_String(t *testing.T) {
 }
 
 func testMovesFromString(t *testing.T, expectedCount int, stringBoard string) {
-	board := FromString(stringBoard)
 	size := 0
-	generatePseudoLegalMoves(&board, func(m Move) {
+	generatePseudoLegalMoves(new(FromString(stringBoard)), func(_ Move) {
 		size++
 	})
 	assert.Equal(t, expectedCount, size)
 }
 
 func testMovesFromFEN(t *testing.T, expectedCount int, fen string) {
-	board := BoardFromFEN(fen)
 	size := 0
-	generatePseudoLegalMoves(&board, func(m Move) {
+	generatePseudoLegalMoves(new(BoardFromFEN(fen)), func(_ Move) {
 		size++
 	})
 	assert.Equal(t, expectedCount, size)
 }
 
 func Test_isOpponentsKingNotUnderCheck(t *testing.T) {
-
 	tests := []struct {
 		name  string
 		board Board

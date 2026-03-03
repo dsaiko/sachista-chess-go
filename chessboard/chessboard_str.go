@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"saiko.cz/sachista/bitboard"
 )
@@ -29,7 +30,7 @@ func (b *Board) String() string {
 	blackPawn := b.Pieces[Black][Pawn].MirroredVertical()
 
 	// print all 64 Pieces
-	for i := 0; i < bitboard.NumberOfSquares; i++ {
+	for i := range bitboard.NumberOfSquares {
 		if (i % 8) == 0 {
 			if i > 0 {
 				buffer.WriteString(strconv.Itoa(9 - (i / 8)))
@@ -83,21 +84,22 @@ func (b *Board) String() string {
 // FromString representation of the board plane.
 // Does not keep castling or enPassant info
 func FromString(str string) Board {
-	fen := ""
+	var fenBuilder strings.Builder
 	reHeader := regexp.MustCompile("a b c d e f g h")
 	str = reHeader.ReplaceAllString(str, "")
 
 	// create FEN string from board pieces
 	for _, c := range str {
-		piece, _ := PieceFromNotation(string(byte(c)))
+		piece, _ := PieceFromNotation(string(c))
 		if piece != NoPiece {
-			fen += string(c)
+			fenBuilder.WriteRune(c)
 		}
 		if c == '-' {
-			fen += "1"
+			fenBuilder.WriteString("1")
 		}
 	}
 
+	fen := fenBuilder.String()
 	if len(fen) < 64 {
 		fen += "/"
 	}

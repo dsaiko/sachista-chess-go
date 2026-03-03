@@ -1,8 +1,9 @@
 package chessboard
 
 import (
-	"saiko.cz/sachista/bitboard"
 	"sync/atomic"
+
+	"saiko.cz/sachista/bitboard"
 )
 
 // PerfTCacheEntry cache record structure
@@ -96,7 +97,7 @@ func PerfT(b *Board, depth int) uint64 {
 
 	// count results
 	count := uint64(0)
-	for i := 0; i < len(moves); i++ {
+	for range moves {
 		count += <-results
 	}
 

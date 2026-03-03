@@ -2,6 +2,7 @@ package bitboard
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +13,7 @@ func TestBitBoard_BitPop(t *testing.T) {
 
 	count := 64
 	var index Index
-	for i := 0; i < 64; i++ {
+	for i := range 64 {
 		assert.Equal(t, count, b.PopCount())
 		index, b = b.BitPop()
 		assert.Equal(t, Index(i), index)
@@ -39,7 +40,7 @@ func TestFromIndex(t *testing.T) {
 }
 
 func TestFromIndex1(t *testing.T) {
-	for i := 0; i < 64; i++ {
+	for i := range 64 {
 		assert.Equal(t, BoardFields[i], BoardFromIndex(Index(i)))
 	}
 }
@@ -49,12 +50,7 @@ func TestBitBoard_ToIndices(t *testing.T) {
 	indices := board.ToIndices()
 
 	contains := func(i Index) bool {
-		for _, v := range indices {
-			if v == i {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(indices, i)
 	}
 
 	assert.Equal(t, 5, len(indices))

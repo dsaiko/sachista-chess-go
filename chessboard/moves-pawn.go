@@ -7,7 +7,7 @@ import (
 var pawnAttacksCache [bitboard.NumberOfColors][bitboard.NumberOfSquares]bitboard.Board
 
 func init() {
-	for i := 0; i < bitboard.NumberOfSquares; i++ {
+	for i := range bitboard.NumberOfSquares {
 		piece := bitboard.BoardFromIndex(bitboard.Index(i))
 
 		pawnAttacksCache[White][i] = piece.ShiftedOneNorthEast() | piece.ShiftedOneNorthWest()
@@ -60,7 +60,7 @@ func pawnMoves(board *Board, handler MoveHandler) {
 			attacks = fromBitBoard.ShiftedOneSouthEast() | fromBitBoard.ShiftedOneSouthWest()
 		}
 
-		//attacks := pawnAttacksCache[board.NextMove][fromIndex]
+		// attacks := pawnAttacksCache[board.NextMove][fromIndex]
 		movesBoard |= attacks & board.OpponentPieces()
 
 		// for all moves

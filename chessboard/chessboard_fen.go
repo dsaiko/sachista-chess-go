@@ -9,7 +9,6 @@ import (
 
 // ToFEN converts board to FEN notation string
 func (b *Board) ToFEN() string {
-
 	var buffer bytes.Buffer
 
 	whiteKing := b.Pieces[White][King].MirroredVertical()
@@ -34,7 +33,7 @@ func (b *Board) ToFEN() string {
 		return 0
 	}
 
-	for i := 0; i < bitboard.NumberOfSquares; i++ {
+	for i := range bitboard.NumberOfSquares {
 		if (i % 8) == 0 {
 			spaces = outputSpaces(spaces)
 			if i > 0 {

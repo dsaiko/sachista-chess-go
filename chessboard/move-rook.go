@@ -15,21 +15,23 @@ var rookMagicFile = [...]bitboard.Board{
 	0x0100804020100804,
 }
 
-var rookMoveRankShift [bitboard.NumberOfSquares]int
-var rookMoveRankMask [bitboard.NumberOfSquares]bitboard.Board
-var rookMoveRankAttacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
-var rookMoveFileMask [bitboard.NumberOfSquares]bitboard.Board
-var rookMoveFileMagic [bitboard.NumberOfSquares]bitboard.Board
-var rookMoveFileAttacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
+var (
+	rookMoveRankShift   [bitboard.NumberOfSquares]int
+	rookMoveRankMask    [bitboard.NumberOfSquares]bitboard.Board
+	rookMoveRankAttacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
+	rookMoveFileMask    [bitboard.NumberOfSquares]bitboard.Board
+	rookMoveFileMagic   [bitboard.NumberOfSquares]bitboard.Board
+	rookMoveFileAttacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
+)
 
 func init() {
 	const fileAMask = bitboard.BoardA2 | bitboard.BoardA3 | bitboard.BoardA4 | bitboard.BoardA5 | bitboard.BoardA6 | bitboard.BoardA7
 
-	for i := 0; i < bitboard.NumberOfSquares; i++ {
+	for i := range bitboard.NumberOfSquares {
 		fieldIndex := bitboard.Index(i)
 
 		// get 6-bit mask for a rank
-		rookMoveRankMask[i] = bitboard.Board(126) << (fieldIndex.Rank() << 3)
+		rookMoveRankMask[i] = bitboard.Board(126) << (fieldIndex.Rank() << 3) //nolint:revive
 
 		// compute needed rank shift
 		rookMoveRankShift[i] = (fieldIndex.Rank() << 3) + 1
@@ -43,11 +45,11 @@ func init() {
 
 	// precompute rank moves
 	// for all pieces
-	for i := 0; i < bitboard.NumberOfSquares; i++ {
+	for i := range bitboard.NumberOfSquares {
 		rankIndex := bitboard.Index(i).Rank()
 
 		// for all occupancy states
-		for n := 0; n < bitboard.NumberOfSquares; n++ {
+		for n := range bitboard.NumberOfSquares {
 			// reconstruct occupancy state
 			board := bitboard.Board(n).Shifted(1, rankIndex)
 
@@ -90,11 +92,11 @@ func init() {
 
 	// precompute file moves
 	// for all pieces
-	for i := 0; i < bitboard.NumberOfSquares; i++ {
+	for i := range bitboard.NumberOfSquares {
 		fileIndex := bitboard.Index(i).File()
 
 		// for all occupancy states
-		for n := 0; n < bitboard.NumberOfSquares; n++ {
+		for n := range bitboard.NumberOfSquares {
 			// reconstruct the occupancy into file
 			board := bitboard.Board(n).Shifted(1, 0).MirroredHorizontal().FlippedA1H8().Shifted(fileIndex, 0)
 
@@ -140,7 +142,7 @@ func init() {
 func oneRookAttacks(sourceIndex bitboard.Index, allPieces bitboard.Board) bitboard.Board {
 	// use magic multipliers to get occupancy state index
 	stateIndexRank := (allPieces & rookMoveRankMask[sourceIndex]) >> rookMoveRankShift[sourceIndex]
-	stateIndexFile := ((allPieces & rookMoveFileMask[sourceIndex]) * rookMoveFileMagic[sourceIndex]) >> 57
+	stateIndexFile := ((allPieces & rookMoveFileMask[sourceIndex]) * rookMoveFileMagic[sourceIndex]) >> 57 //nolint:revive
 
 	// get possible attacks for field / occupancy state index
 	return rookMoveRankAttacks[sourceIndex][stateIndexRank] | rookMoveFileAttacks[sourceIndex][stateIndexFile]
@@ -170,7 +172,7 @@ func rookMoves(board *Board, handler MoveHandler) {
 
 	var fromIndex, toIndex bitboard.Index
 
-	for i := 0; i < 2; i++ { // rooks and queens
+	for range 2 { // rooks and queens
 		// for all rooks
 		for rook != bitboard.EmptyBoard {
 			// get next rook

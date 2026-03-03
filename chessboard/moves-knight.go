@@ -7,17 +7,16 @@ import (
 var knightMovesCache [bitboard.NumberOfSquares]bitboard.Board
 
 func init() {
-	for i := 0; i < bitboard.NumberOfSquares; i++ {
+	for i := range bitboard.NumberOfSquares {
 		piece := bitboard.BoardFromIndex(bitboard.Index(i))
-		knightMovesCache[i] =
-			piece.Shifted(2, 1) |
-				piece.Shifted(2, -1) |
-				piece.Shifted(1, 2) |
-				piece.Shifted(-1, 2) |
-				piece.Shifted(-2, 1) |
-				piece.Shifted(-2, -1) |
-				piece.Shifted(-1, -2) |
-				piece.Shifted(1, -2)
+		knightMovesCache[i] = piece.Shifted(2, 1) |
+			piece.Shifted(2, -1) |
+			piece.Shifted(1, 2) |
+			piece.Shifted(-1, 2) |
+			piece.Shifted(-2, 1) |
+			piece.Shifted(-2, -1) |
+			piece.Shifted(-1, -2) |
+			piece.Shifted(1, -2)
 	}
 }
 

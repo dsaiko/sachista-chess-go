@@ -115,11 +115,15 @@ var BoardFiles = [...]Board{
 	BoardH1 | BoardH2 | BoardH3 | BoardH4 | BoardH5 | BoardH6 | BoardH7 | BoardH8,
 }
 
-var BoardFileA = BoardFiles[0]
-var BoardFileH = BoardFiles[7]
+var (
+	BoardFileA = BoardFiles[0]
+	BoardFileH = BoardFiles[7]
+)
 
-var BoardRank1 = BoardRanks[0]
-var BoardRank8 = BoardRanks[7]
+var (
+	BoardRank1 = BoardRanks[0]
+	BoardRank8 = BoardRanks[7]
+)
 
 var BoardFrame = BoardRank1 | BoardRank8 | BoardFileA | BoardFileH
 

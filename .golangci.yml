@@ -1,0 +1,98 @@
+version: "2"
+
+run:
+  timeout: 5m
+
+output:
+  formats:
+    text:
+      path: stdout
+      colors: true
+      print-issued-lines: true
+      print-linter-name: true
+
+linters:
+  default: none
+  enable:
+    - gocritic     # Provides diagnostics that check for bugs, performance and style issues.
+    - prealloc     # Finds slice declarations that could potentially be pre-allocated
+    - gosec        # Inspects source code for security problems.
+    - bodyclose    # Checks whether HTTP response body is closed successfully.
+    - unconvert    # Remove unnecessary type conversions.
+    - ineffassign  # Detects unused assignments
+    - unparam      # Finds unused function parameters
+    - staticcheck  # Huge set of static analysis checks
+    - nolintlint   # Reports ill-formed or insufficient nolint directives.
+    - rowserrcheck # Checks whether Rows.Err of rows is checked successfully.
+    - sloglint     # Ensure consistent code style when using log/slog.
+    - nilerr       # Finds the code that returns nil even if it checks that the error is not nil.
+    - revive       # Drop-in replacement of golint.
+    - errorlint    # Find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
+    - copyloopvar  # A linter detects places where loop variables are copied.
+    - unconvert    # Remove unnecessary type conversions.
+    - nakedret     # Checks that functions with naked returns are not longer than a maximum size (can be zero).
+    - perfsprint   # Checks that fmt.Sprintf can be replaced with a faster alternative.
+  exclusions:
+    paths:
+      - vendor
+      - .github
+  settings:
+    misspell:
+      locale: US
+    perfsprint:
+      errorf: true
+      strconcat: false
+    revive:
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: bool-literal-in-expr
+        - name: context-as-argument
+        - name: if-return
+        - name: increment-decrement
+        - name: var-naming
+          arguments:
+            - [ ]
+            - [ ]
+            - - skip-package-name-checks: true
+        - name: var-declaration
+        - name: range
+        - name: receiver-naming
+        - name: time-naming
+        - name: unexported-return
+        - name: indent-error-flow
+        - name: errorf
+        - name: empty-block
+        - name: superfluous-else
+        - name: early-return
+        - name: unused-parameter
+        - name: unreachable-code
+        - name: redefines-builtin-id
+        - name: unnecessary-stmt
+        - name: use-any
+        - name: line-length-limit
+          arguments: [ 200 ]
+        - name: add-constant
+          exclude: [ "**/*_test.go", "**/math.*" ]
+          arguments:
+            - max-lit-count: "8"
+              allow-strs: '""'
+              allow-ints: "0,1,2,3,4,5,6,7,8,9,10,32,64,100,1024"
+              allow-floats: "1.0,1024.0"
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+    - gofumpt
+  exclusions:
+    paths:
+      - vendor
+  settings:
+    gofumpt:
+      module-path: github.com/oddin-gg/fujin

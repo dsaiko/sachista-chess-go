@@ -19,18 +19,17 @@ const (
 var kingMovesCache [bitboard.NumberOfSquares]bitboard.Board
 
 func init() {
-	for i := 0; i < bitboard.NumberOfSquares; i++ {
+	for i := range bitboard.NumberOfSquares {
 		piece := bitboard.BoardFromIndex(bitboard.Index(i))
 
-		kingMovesCache[i] =
-			piece.Shifted(1, -1) |
-				piece.Shifted(1, 0) |
-				piece.Shifted(1, 1) |
-				piece.Shifted(0, -1) |
-				piece.Shifted(0, 1) |
-				piece.Shifted(-1, -1) |
-				piece.Shifted(-1, 0) |
-				piece.Shifted(-1, 1)
+		kingMovesCache[i] = piece.Shifted(1, -1) |
+			piece.Shifted(1, 0) |
+			piece.Shifted(1, 1) |
+			piece.Shifted(0, -1) |
+			piece.Shifted(0, 1) |
+			piece.Shifted(-1, -1) |
+			piece.Shifted(-1, 0) |
+			piece.Shifted(-1, 1)
 	}
 }
 

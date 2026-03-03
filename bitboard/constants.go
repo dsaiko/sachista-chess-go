@@ -1,6 +1,8 @@
 package bitboard
 
-const NumberOfColors = 2
-const NumberOfSquares = 64
-const NumberOfPieces = 6
-const NumberOfCastlingOptions = 4
+const (
+	NumberOfColors          = 2
+	NumberOfSquares         = 64
+	NumberOfPieces          = 6
+	NumberOfCastlingOptions = 4
+)

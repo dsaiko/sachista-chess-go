@@ -2,6 +2,7 @@ package chessboard
 
 import (
 	"bytes"
+
 	"saiko.cz/sachista/bitboard"
 )
 

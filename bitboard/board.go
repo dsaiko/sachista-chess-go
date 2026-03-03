@@ -78,7 +78,7 @@ func (b Board) Shifted(dx int, dy int) Board {
 
 	// dx = left / right
 	if dx > 0 {
-		for i := 0; i < dx; i++ {
+		for range dx {
 			//goland:noinspection GoAssignmentToReceiver
 			b = b.ShiftedOneEast()
 		}
@@ -97,14 +97,14 @@ func (b Board) Shifted(dx int, dy int) Board {
 func (b Board) MirroredVertical() Board {
 	result := EmptyBoard
 
-	result |= (b >> 56) & BoardRank1
-	result |= ((b >> 48) & BoardRank1) << 8
-	result |= ((b >> 40) & BoardRank1) << 16
-	result |= ((b >> 32) & BoardRank1) << 24
-	result |= ((b >> 24) & BoardRank1) << 32
-	result |= ((b >> 16) & BoardRank1) << 40
-	result |= ((b >> 8) & BoardRank1) << 48
-	result |= (b & BoardRank1) << 56
+	result |= (b >> 56) & BoardRank1         //nolint:revive
+	result |= ((b >> 48) & BoardRank1) << 8  //nolint:revive
+	result |= ((b >> 40) & BoardRank1) << 16 //nolint:revive
+	result |= ((b >> 32) & BoardRank1) << 24 //nolint:revive
+	result |= ((b >> 24) & BoardRank1) << 32 //nolint:revive
+	result |= ((b >> 16) & BoardRank1) << 40 //nolint:revive
+	result |= ((b >> 8) & BoardRank1) << 48  //nolint:revive
+	result |= (b & BoardRank1) << 56         //nolint:revive
 
 	return result
 }
@@ -130,11 +130,11 @@ func (b Board) FlippedA1H8() Board {
 	const k2 = Board(0x3333000033330000)
 	const k4 = Board(0x0f0f0f0f00000000)
 
-	var t = k4 & (b ^ (b << 28))
+	t := k4 & (b ^ (b << 28)) //nolint:revive
 
-	b ^= t ^ (t >> 28)
-	t = k2 & (b ^ (b << 14))
-	b ^= t ^ (t >> 14)
+	b ^= t ^ (t >> 28)       //nolint:revive
+	t = k2 & (b ^ (b << 14)) //nolint:revive
+	b ^= t ^ (t >> 14)       //nolint:revive
 	t = k1 & (b ^ (b << 7))
 	b ^= t ^ (t >> 7)
 
@@ -161,7 +161,7 @@ func (b Board) String() string {
 
 	buffer.WriteString(BoardHeader)
 
-	for i := 0; i < NumberOfSquares; i++ {
+	for i := range NumberOfSquares {
 		if (i % 8) == 0 {
 			if i > 0 {
 				// print right column digit

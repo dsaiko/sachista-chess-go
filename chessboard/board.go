@@ -113,8 +113,8 @@ func (b *Board) Hash() uint64 {
 
 	var i bitboard.Index
 
-	for color := 0; color < 2; color++ {
-		for piece := 0; piece < 6; piece++ {
+	for color := range 2 {
+		for piece := range 6 {
 			pieces := b.Pieces[color][piece]
 			for pieces > 0 {
 				i, pieces = pieces.BitPop()

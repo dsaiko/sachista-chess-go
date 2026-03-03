@@ -1,10 +1,11 @@
 package chessboard
 
 import (
-	"github.com/stretchr/testify/assert"
-	"saiko.cz/sachista/bitboard"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"saiko.cz/sachista/bitboard"
 )
 
 func TestMove_MakeMove(t *testing.T) {
@@ -38,7 +39,8 @@ func TestMove_MakeMove(t *testing.T) {
 2 - - - - - - - - 2
 1 - - - - - - - - 1
   a b c d e f g h
-`},
+`,
+		},
 		{
 			board: FromString(`
   a b c d e f g h
@@ -64,7 +66,8 @@ func TestMove_MakeMove(t *testing.T) {
 2 - - - - - - - - 2
 1 - - - - - - - - 1
   a b c d e f g h
-`},
+`,
+		},
 	}
 	for _, tc := range tests {
 		t.Run("", func(t *testing.T) {
@@ -89,7 +92,7 @@ func TestZobristFailScenarion1(t *testing.T) {
 func TestZobrist(t *testing.T) {
 	board := BoardFromFEN("r4rk1/p2pqpb1/bn2pnp1/2pP4/1p2P3/3N1Q1p/PPPBBPPP/RN2K2R w KQ c6 0 3")
 
-	for i := 0; i < 1000; i++ {
+	for range 1000 {
 		moves := GenerateLegalMoves(&board)
 		board = *moves[0].ApplyTo(board)
 	}

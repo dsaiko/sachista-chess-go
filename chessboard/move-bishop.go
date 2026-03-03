@@ -40,20 +40,26 @@ var bishopMagicA1H8 = [...]bitboard.Board{
 	0x0,
 }
 
-var bishopA1H8Index [bitboard.NumberOfSquares]int
-var bishopA8H1Index [bitboard.NumberOfSquares]int
+var (
+	bishopA1H8Index [bitboard.NumberOfSquares]int
+	bishopA8H1Index [bitboard.NumberOfSquares]int
+)
 
-var bishopMoveA1H8Mask [bitboard.NumberOfSquares]bitboard.Board
-var bishopMoveA1H8Magic [bitboard.NumberOfSquares]bitboard.Board
-var bishopMoveA8H1Mask [bitboard.NumberOfSquares]bitboard.Board
-var bishopMoveA8H1Magic [bitboard.NumberOfSquares]bitboard.Board
+var (
+	bishopMoveA1H8Mask  [bitboard.NumberOfSquares]bitboard.Board
+	bishopMoveA1H8Magic [bitboard.NumberOfSquares]bitboard.Board
+	bishopMoveA8H1Mask  [bitboard.NumberOfSquares]bitboard.Board
+	bishopMoveA8H1Magic [bitboard.NumberOfSquares]bitboard.Board
+)
 
-var bishopMoveA1H8Attacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
-var bishopMoveA8H1Attacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
+var (
+	bishopMoveA1H8Attacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
+	bishopMoveA8H1Attacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
+)
 
 func init() {
 	// for all fields
-	for i := 0; i < bitboard.NumberOfSquares; i++ {
+	for i := range bitboard.NumberOfSquares {
 		// compute index of diagonal for the field
 		bishopA8H1Index[i] = bitboard.Index(i).File() + bitboard.Index(i).Rank()%8
 		bishopA1H8Index[i] = bitboard.Index(i).File() + 7 - bitboard.Index(i).Rank()%8
@@ -72,9 +78,9 @@ func init() {
 	// n is 6 bit configuration
 
 	// for all fields
-	for i := 0; i < bitboard.NumberOfSquares; i++ {
+	for i := range bitboard.NumberOfSquares {
 		// for all possible diagonal states
-		for n := 0; n < bitboard.NumberOfSquares; n++ {
+		for n := range bitboard.NumberOfSquares {
 			// get the diagonal
 			diagonal := bitboard.BoardA1H8[bishopA1H8Index[i]]
 
@@ -141,9 +147,9 @@ func init() {
 	// i is field index
 	// n is 6 bit configuration
 	// for all fields
-	for i := 0; i < bitboard.NumberOfSquares; i++ {
+	for i := range bitboard.NumberOfSquares {
 		// for all possible diagonal states
-		for n := 0; n < bitboard.NumberOfSquares; n++ {
+		for n := range bitboard.NumberOfSquares {
 			// get the diagonal
 			diagonal := bitboard.BoardA8H1[bishopA8H1Index[i]]
 
@@ -202,8 +208,8 @@ func init() {
 }
 
 func oneBishopAttacks(sourceIndex bitboard.Index, allPieces bitboard.Board) bitboard.Board {
-	stateIndexA8H1 := ((allPieces & bishopMoveA8H1Mask[sourceIndex]) * bishopMoveA8H1Magic[sourceIndex]) >> 57
-	stateIndexA1H8 := ((allPieces & bishopMoveA1H8Mask[sourceIndex]) * bishopMoveA1H8Magic[sourceIndex]) >> 57
+	stateIndexA8H1 := ((allPieces & bishopMoveA8H1Mask[sourceIndex]) * bishopMoveA8H1Magic[sourceIndex]) >> 57 //nolint:revive
+	stateIndexA1H8 := ((allPieces & bishopMoveA1H8Mask[sourceIndex]) * bishopMoveA1H8Magic[sourceIndex]) >> 57 //nolint:revive
 
 	// add attacks
 	return bishopMoveA8H1Attacks[sourceIndex][stateIndexA8H1] | bishopMoveA1H8Attacks[sourceIndex][stateIndexA1H8]
@@ -232,7 +238,7 @@ func bishopMoves(board *Board, handler MoveHandler) {
 
 	var fromIndex, toIndex bitboard.Index
 
-	for i := 0; i < 2; i++ { // bishops and queens
+	for range 2 { // bishops and queens
 		// for all rooks
 		for bishop != bitboard.EmptyBoard {
 			// get next rook
