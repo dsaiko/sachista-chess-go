@@ -21,6 +21,7 @@ const (
 // kingMovesCache stores pre-computed king move bitboards for each square index.
 var kingMovesCache [bitboard.NumberOfSquares]bitboard.Board
 
+// init precomputes king move bitboards for every square.
 func init() {
 	for i := range bitboard.NumberOfSquares {
 		piece := bitboard.BoardFromIndex(bitboard.Index(i))

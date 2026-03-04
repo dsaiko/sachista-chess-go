@@ -29,11 +29,14 @@ func main() {
 			logger.err.Fatalf("Error: Invalid depth argument: %v\n", os.Args[1])
 		}
 	case len(os.Args) == 3:
+		if depth, err = strconv.Atoi(os.Args[1]); err != nil {
+			logger.err.Fatalf("Error: Invalid depth argument: %v\n", os.Args[1])
+		}
 		board = chessboard.BoardFromFEN(os.Args[2])
 		if board.ZobristHash == 0 {
 			logger.err.Fatalf("Error: Invalid FEN String - can not create Chess board: %v\n", os.Args[2])
 		}
-	default:
+	case len(os.Args) > 3:
 		logger.err.Printf("usage: [NO-ARGUMENTS] - running standard layout perft for the default depth of %v\n", depth)
 		logger.err.Printf("usage: [DEPTH]        - running standard layout perft for the given depth\n")
 		logger.err.Printf("usage: [DEPTH] [FEN]  - running custom board layout perft for the given depth\n")

@@ -27,7 +27,7 @@ The following optimizations were applied:
 5. **Removed `sync/atomic` from cache operations** -- On ARM64/x86-64, aligned 64-bit loads/stores are naturally atomic. Removing `atomic.LoadUint64`/`StoreUint64` (which use serializing LDAR/STLR instructions on ARM64) reduced cache lookup cost. The XOR consistency check safely detects any torn reads. (~5% improvement)
 6. **Inlined capture detection in `ApplyTo`** -- Replaced the `checkCapture` closure with a direct loop over piece types.
 7. **Branchless `OpponentColor`** -- Changed from if/else to `1 ^ b.NextMove`.
-8. **Profile-Guided Optimization (PGO)** -- Included a `default.pgo` profile for the Go compiler to devirtualize the move handler callback and optimize hot paths. (~3% improvement)
+8. **Profile-Guided Optimization (PGO)** -- Used a `default.pgo` profile for the Go compiler to devirtualize the move handler callback and optimize hot paths. (~3% improvement)
 
 **Apple M4 -- macOS (arm64)**
 

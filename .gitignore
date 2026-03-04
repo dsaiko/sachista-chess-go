@@ -3,4 +3,6 @@ bin
 /cpu.prof
 /mem.prof
 .vscode
+coverage.html
+coverage.out
 

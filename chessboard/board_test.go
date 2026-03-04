@@ -31,6 +31,32 @@ func TestBoard_Stats(t *testing.T) {
 	assert.Equal(t, bitboard.IndexE8, b.OpponentKingIndex())
 }
 
+func TestBoard_OpponentColor(t *testing.T) {
+	b := EmptyBoard()
+	b.NextMove = White
+	assert.Equal(t, Black, b.OpponentColor())
+	b.NextMove = Black
+	assert.Equal(t, White, b.OpponentColor())
+}
+
+func TestBoard_MyPieces(t *testing.T) {
+	b := StandardBoard()
+	b.NextMove = White
+	assert.Equal(t, b.PiecesByColor(White), b.MyPieces())
+	b.NextMove = Black
+	assert.Equal(t, b.PiecesByColor(Black), b.MyPieces())
+}
+
+func TestBoard_RecomputeOccupied(t *testing.T) {
+	b := StandardBoard()
+	// Corrupt Occupied then recompute
+	b.Occupied[White] = bitboard.EmptyBoard
+	b.Occupied[Black] = bitboard.EmptyBoard
+	b.RecomputeOccupied()
+	assert.Equal(t, 16, b.PiecesByColor(White).PopCount())
+	assert.Equal(t, 16, b.PiecesByColor(Black).PopCount())
+}
+
 func TestBoard_UpdateZobrist(t *testing.T) {
 	b1 := StandardBoard()
 	b2 := StandardBoard()

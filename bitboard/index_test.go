@@ -27,3 +27,25 @@ func TestFromNotation(t *testing.T) {
 	assert.Equal(t, IndexA1, a1)
 	assert.Equal(t, IndexH8, h8)
 }
+
+func TestIndex_FileRank(t *testing.T) {
+	assert.Equal(t, 0, IndexA1.File())
+	assert.Equal(t, 0, IndexA1.Rank())
+
+	assert.Equal(t, 7, IndexH8.File())
+	assert.Equal(t, 7, IndexH8.Rank())
+
+	// e4: e-file = 4 (0-indexed), rank 4 = 3 (0-indexed)
+	assert.Equal(t, 4, IndexE4.File())
+	assert.Equal(t, 3, IndexE4.Rank())
+
+	// f7: f-file = 5, rank 7 = 6
+	assert.Equal(t, 5, IndexF7.File())
+	assert.Equal(t, 6, IndexF7.Rank())
+
+	assert.Equal(t, 7, IndexH1.File())
+	assert.Equal(t, 0, IndexH1.Rank())
+
+	assert.Equal(t, 0, IndexA8.File())
+	assert.Equal(t, 7, IndexA8.Rank())
+}

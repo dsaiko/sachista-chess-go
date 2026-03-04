@@ -1,3 +1,11 @@
+// Package bitboard provides a 64-bit bitboard representation of a chess board.
+//
+// A bitboard (type Board) is a uint64 where each bit corresponds to one square:
+// bit 0 = a1, bit 7 = h1, bit 56 = a8, bit 63 = h8.
+// This allows efficient bulk move computation using bitwise operations.
+//
+// The package also defines the Index type for square addressing and pre-computed
+// board constants for files, ranks, and diagonals.
 package bitboard
 
 import (

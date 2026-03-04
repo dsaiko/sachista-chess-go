@@ -125,6 +125,7 @@ var (
 	BoardFileH = BoardFiles[7]
 )
 
+// Convenience aliases for the first and eighth ranks, used frequently in move generation.
 var (
 	BoardRank1 = BoardRanks[0]
 	BoardRank8 = BoardRanks[7]

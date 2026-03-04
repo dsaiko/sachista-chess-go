@@ -17,15 +17,20 @@ var rookMagicFile = [...]bitboard.Board{
 	0x0100804020100804,
 }
 
+// Pre-computed lookup data for rook rank and file move generation.
+// Each array is indexed by square (0-63); attack tables are further indexed by 6-bit occupancy state.
 var (
-	rookMoveRankShift   [bitboard.NumberOfSquares]int
-	rookMoveRankMask    [bitboard.NumberOfSquares]bitboard.Board
-	rookMoveRankAttacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
-	rookMoveFileMask    [bitboard.NumberOfSquares]bitboard.Board
-	rookMoveFileMagic   [bitboard.NumberOfSquares]bitboard.Board
-	rookMoveFileAttacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
+	rookMoveRankShift   [bitboard.NumberOfSquares]int                                      // right-shift to normalize rank occupancy to a 6-bit index
+	rookMoveRankMask    [bitboard.NumberOfSquares]bitboard.Board                           // 6-bit inner-square occupancy mask for the rank
+	rookMoveRankAttacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board // attack table indexed by [square][rank-occupancy]
+	rookMoveFileMask    [bitboard.NumberOfSquares]bitboard.Board                           // 6-bit inner-square occupancy mask for the file
+	rookMoveFileMagic   [bitboard.NumberOfSquares]bitboard.Board                           // magic multiplier for file occupancy hashing
+	rookMoveFileAttacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board // attack table indexed by [square][file-occupancy]
 )
 
+// init precomputes the magic bitboard lookup tables for rook (rank/file) move generation.
+// For each square and each possible 6-bit rank or file occupancy state, the reachable squares
+// are stored in rookMoveRankAttacks and rookMoveFileAttacks.
 func init() {
 	const fileAMask = bitboard.BoardA2 | bitboard.BoardA3 | bitboard.BoardA4 | bitboard.BoardA5 | bitboard.BoardA6 | bitboard.BoardA7
 

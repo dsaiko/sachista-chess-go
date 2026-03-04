@@ -14,24 +14,21 @@ output:
 linters:
   default: none
   enable:
-    - gocritic     # Provides diagnostics that check for bugs, performance and style issues.
-    - prealloc     # Finds slice declarations that could potentially be pre-allocated
+    - gocritic     # Diagnostics for bugs, performance and style issues.
+    - prealloc     # Finds slice declarations that could potentially be pre-allocated.
     - gosec        # Inspects source code for security problems.
-    - bodyclose    # Checks whether HTTP response body is closed successfully.
     - unconvert    # Remove unnecessary type conversions.
-    - ineffassign  # Detects unused assignments
-    - unparam      # Finds unused function parameters
-    - staticcheck  # Huge set of static analysis checks
+    - ineffassign  # Detects unused assignments.
+    - unparam      # Finds unused function parameters.
+    - staticcheck  # Comprehensive static analysis checks.
     - nolintlint   # Reports ill-formed or insufficient nolint directives.
-    - rowserrcheck # Checks whether Rows.Err of rows is checked successfully.
-    - sloglint     # Ensure consistent code style when using log/slog.
-    - nilerr       # Finds the code that returns nil even if it checks that the error is not nil.
+    - nilerr       # Finds code that returns nil even if it checks that the error is not nil.
     - revive       # Drop-in replacement of golint.
-    - errorlint    # Find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
-    - copyloopvar  # A linter detects places where loop variables are copied.
-    - unconvert    # Remove unnecessary type conversions.
-    - nakedret     # Checks that functions with naked returns are not longer than a maximum size (can be zero).
+    - errorlint    # Finds code that will cause problems with Go 1.13 error wrapping.
+    - copyloopvar  # Detects places where loop variables are copied.
+    - nakedret     # Checks that functions with naked returns are not longer than a maximum size.
     - perfsprint   # Checks that fmt.Sprintf can be replaced with a faster alternative.
+    - misspell     # Finds commonly misspelled English words.
   exclusions:
     paths:
       - vendor
@@ -52,7 +49,6 @@ linters:
         - name: error-strings
         - name: error-naming
         - name: bool-literal-in-expr
-        - name: context-as-argument
         - name: if-return
         - name: increment-decrement
         - name: var-naming
@@ -95,4 +91,4 @@ formatters:
       - vendor
   settings:
     gofumpt:
-      module-path: github.com/oddin-gg/fujin
+      module-path: saiko.cz/sachista

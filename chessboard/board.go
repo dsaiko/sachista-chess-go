@@ -1,3 +1,19 @@
+// Package chessboard provides a complete chess position representation and move generation.
+//
+// The Board struct holds the full game state: piece bitboards for both colors,
+// cached occupancy bitboards, castling rights, en passant target, move counters,
+// and an incrementally-maintained Zobrist hash for fast position fingerprinting.
+//
+// Move generation is pseudo-legal (moves are generated without checking whether
+// the king is left in check). Callers must filter pseudo-legal moves by verifying
+// that the king is not in check after each move; see GenerateLegalMoves and
+// isOpponentsKingNotUnderCheck.
+//
+// Sliding piece moves (bishops, rooks, queens) use pre-computed magic bitboard
+// lookup tables for O(1) attack generation per piece.
+//
+// PerfT provides a perft (performance test / move path enumeration) implementation
+// using goroutine-level parallelism and a lockless Zobrist transposition cache.
 package chessboard
 
 import (
@@ -30,8 +46,8 @@ type Board struct {
 type Color int
 
 const (
-	White Color = iota
-	Black
+	White Color = iota // first player; value 0 is also used for branchless XOR in OpponentColor
+	Black              // second player
 )
 
 // String returns "w" for White, "b" for Black.

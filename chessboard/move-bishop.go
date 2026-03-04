@@ -43,23 +43,29 @@ var bishopMagicA1H8 = [...]bitboard.Board{
 	0x0,
 }
 
+// bishopA1H8Index and bishopA8H1Index map each square to its diagonal/anti-diagonal index.
 var (
-	bishopA1H8Index [bitboard.NumberOfSquares]int
-	bishopA8H1Index [bitboard.NumberOfSquares]int
+	bishopA1H8Index [bitboard.NumberOfSquares]int // diagonal index (a1-h8) for each square, 0-14
+	bishopA8H1Index [bitboard.NumberOfSquares]int // anti-diagonal index (a8-h1) for each square, 0-14
 )
 
+// Masks and magic multipliers for mapping diagonal occupancy to a 6-bit lookup index.
 var (
-	bishopMoveA1H8Mask  [bitboard.NumberOfSquares]bitboard.Board
-	bishopMoveA1H8Magic [bitboard.NumberOfSquares]bitboard.Board
-	bishopMoveA8H1Mask  [bitboard.NumberOfSquares]bitboard.Board
-	bishopMoveA8H1Magic [bitboard.NumberOfSquares]bitboard.Board
+	bishopMoveA1H8Mask  [bitboard.NumberOfSquares]bitboard.Board // 6-bit inner-square occupancy mask for a1-h8 diagonal
+	bishopMoveA1H8Magic [bitboard.NumberOfSquares]bitboard.Board // magic multiplier for a1-h8 occupancy hashing
+	bishopMoveA8H1Mask  [bitboard.NumberOfSquares]bitboard.Board // 6-bit inner-square occupancy mask for a8-h1 anti-diagonal
+	bishopMoveA8H1Magic [bitboard.NumberOfSquares]bitboard.Board // magic multiplier for a8-h1 occupancy hashing
 )
 
+// Pre-computed bishop attack tables, indexed by [square][6-bit occupancy state].
 var (
 	bishopMoveA1H8Attacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
 	bishopMoveA8H1Attacks [bitboard.NumberOfSquares][bitboard.NumberOfSquares]bitboard.Board
 )
 
+// init precomputes the magic bitboard lookup tables for bishop (diagonal) move generation.
+// For each square and each possible 6-bit diagonal occupancy state, the reachable squares
+// are stored in bishopMoveA1H8Attacks and bishopMoveA8H1Attacks.
 func init() {
 	// for all fields
 	for i := range bitboard.NumberOfSquares {

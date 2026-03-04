@@ -7,6 +7,7 @@ import (
 // knightMovesCache stores pre-computed knight move bitboards for each square index.
 var knightMovesCache [bitboard.NumberOfSquares]bitboard.Board
 
+// init precomputes knight move bitboards for every square.
 func init() {
 	for i := range bitboard.NumberOfSquares {
 		piece := bitboard.BoardFromIndex(bitboard.Index(i))

@@ -7,6 +7,7 @@ import (
 // pawnAttacksCache stores pre-computed pawn attack squares for each color and square index.
 var pawnAttacksCache [bitboard.NumberOfColors][bitboard.NumberOfSquares]bitboard.Board
 
+// init precomputes pawn attack bitboards for both colors at every square.
 func init() {
 	for i := range bitboard.NumberOfSquares {
 		piece := bitboard.BoardFromIndex(bitboard.Index(i))

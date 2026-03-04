@@ -153,6 +153,34 @@ func TestBitBoard_MirrorVertical(t *testing.T) {
 	assert.Equal(t, BoardRanks[1], BoardRanks[6].MirroredVertical())
 }
 
+func TestBitBoard_BitScan(t *testing.T) {
+	// TrailingZeros64(0) == 64, so BitScan on empty board returns Index(64)
+	assert.Equal(t, Index(64), EmptyBoard.BitScan())
+	assert.Equal(t, IndexA1, BoardA1.BitScan())
+	assert.Equal(t, IndexH8, BoardH8.BitScan())
+	// Returns lowest set bit when multiple bits are set
+	assert.Equal(t, IndexA1, (BoardA1 | BoardH8).BitScan())
+	assert.Equal(t, IndexE4, (BoardE4 | BoardH8).BitScan())
+}
+
+func TestBitBoard_Shifted(t *testing.T) {
+	// Zero shift is identity
+	assert.Equal(t, BoardA1, BoardA1.Shifted(0, 0))
+
+	// Shift north-east diagonally
+	assert.Equal(t, BoardC3, BoardA1.Shifted(2, 2))
+	assert.Equal(t, BoardH8, BoardA1.Shifted(7, 7))
+
+	// Shift off-board returns empty
+	assert.Equal(t, EmptyBoard, BoardH8.Shifted(1, 0))
+	assert.Equal(t, EmptyBoard, BoardA1.Shifted(0, -1))
+	assert.Equal(t, EmptyBoard, BoardH1.Shifted(1, 0))
+
+	// Negative shifts
+	assert.Equal(t, BoardD4, BoardG7.Shifted(-3, -3))
+	assert.Equal(t, BoardA1, BoardH8.Shifted(-7, -7))
+}
+
 func TestBitBoard_String(t *testing.T) {
 	b := BoardFrame | BoardC3
 	expected := `  a b c d e f g h
