@@ -4,6 +4,8 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
+// Castling prerequisite bitmasks: squares that must be empty and squares that must not be under attack.
+// OO = king-side (short) castling, OOO = queen-side (long) castling.
 const (
 	WhiteCastleOOEmpty    = bitboard.BoardF1 | bitboard.BoardG1
 	WhiteCastleOOAttacks  = bitboard.BoardE1 | bitboard.BoardF1 | bitboard.BoardG1
@@ -16,6 +18,7 @@ const (
 	BlackCastleOOOAttacks = bitboard.BoardC8 | bitboard.BoardD8 | bitboard.BoardE8
 )
 
+// kingMovesCache stores pre-computed king move bitboards for each square index.
 var kingMovesCache [bitboard.NumberOfSquares]bitboard.Board
 
 func init() {
@@ -33,6 +36,7 @@ func init() {
 	}
 }
 
+// kingAttacks returns the attack bitboard for the king of the given color.
 func kingAttacks(board *Board, color Color) bitboard.Board {
 	king := board.Pieces[color][King]
 	if king == bitboard.EmptyBoard {
@@ -42,6 +46,7 @@ func kingAttacks(board *Board, color Color) bitboard.Board {
 	return kingMovesCache[king.BitScan()]
 }
 
+// kingMoves generates all pseudo-legal king moves for the current side, including castling.
 func kingMoves(board *Board, handler MoveHandler) {
 	king := board.Pieces[board.NextMove][King]
 	if king == bitboard.EmptyBoard {

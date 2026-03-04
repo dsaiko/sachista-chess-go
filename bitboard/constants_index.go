@@ -1,6 +1,6 @@
 package bitboard
 
-// Constants for index position of the piece on the bitboard
+// Pre-computed Index constants for each square on the board.
 //
 //goland:noinspection GoUnusedConst
 const (

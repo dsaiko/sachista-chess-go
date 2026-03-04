@@ -4,6 +4,7 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
+// knightMovesCache stores pre-computed knight move bitboards for each square index.
 var knightMovesCache [bitboard.NumberOfSquares]bitboard.Board
 
 func init() {
@@ -20,6 +21,7 @@ func init() {
 	}
 }
 
+// knightAttacks returns the combined attack bitboard for all knights of the given color.
 func knightAttacks(board *Board, color Color) bitboard.Board {
 	pieces := board.Pieces[color][Knight]
 	attacks := bitboard.EmptyBoard
@@ -33,6 +35,7 @@ func knightAttacks(board *Board, color Color) bitboard.Board {
 	return attacks
 }
 
+// knightMoves generates all pseudo-legal knight moves for the current side.
 func knightMoves(board *Board, handler MoveHandler) {
 	pieces := board.Pieces[board.NextMove][Knight]
 

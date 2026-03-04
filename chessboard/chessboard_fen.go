@@ -7,7 +7,7 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
-// ToFEN converts board to FEN notation string
+// ToFEN converts the board position to a FEN (Forsyth-Edwards Notation) string.
 func (b *Board) ToFEN() string {
 	var buffer bytes.Buffer
 
@@ -119,7 +119,7 @@ func (b *Board) ToFEN() string {
 	return buffer.String()
 }
 
-// BoardFromFEN converts FEN string to board object
+// BoardFromFEN parses a FEN (Forsyth-Edwards Notation) string and returns the corresponding board.
 func BoardFromFEN(fen string) Board {
 	b := EmptyBoard()
 	i := 0

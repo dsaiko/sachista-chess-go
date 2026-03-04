@@ -1,20 +1,13 @@
+// Package zobrist implements Zobrist hashing for chess position fingerprinting.
+//
+// Zobrist hashing assigns a random 64-bit key to each unique aspect of a chess
+// position (piece-color-square combinations, castling rights, en passant squares,
+// and side to move). A position's hash is the XOR of all applicable keys, allowing
+// incremental updates when making/unmaking moves.
+//
+// The random keys are generated using crypto/rand, ensuring high-quality randomness
+// with negligible collision probability for practical use in transposition tables.
 package zobrist
-
-// RANDOM RKISS is our pseudo random number generator (PRNG) used to compute hash keys.
-// George Marsaglia invented the RNG-Kiss-family in the early 90's. This is a
-// specific version that Heinz van Saanen derived from some public domain code
-// by Bob Jenkins. Following the feature list, as tested by Heinz.
-//
-// - Quite platform independent
-// - Passes ALL dieharder tests! Here *nix sys-rand() e.g. fails miserably:-)
-// - ~12 times faster than my *nix sys-rand()
-// - ~4 times faster than SSE2-version of Mersenne twister
-// - Average cycle length: ~2^126
-// - 64 bit seed
-// - Return doubles with a full 53 bit mantissa
-// - Thread safe
-//
-// PRNG Inspired by Stockfish GPL source code
 
 import (
 	"crypto/rand"
@@ -23,8 +16,8 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
-// Keys for Zobrist checksum of the board
-// Hash does not include move clocks
+// Keys holds the random values for all board state components used in Zobrist hashing.
+// The hash does not include move clocks (half-move clock and full move number).
 type Keys struct {
 	Pieces    [bitboard.NumberOfColors][bitboard.NumberOfPieces + 1][bitboard.NumberOfSquares]uint64
 	Castling  [bitboard.NumberOfColors][bitboard.NumberOfCastlingOptions]uint64
@@ -32,12 +25,9 @@ type Keys struct {
 	Side      uint64
 }
 
-// NewKeys initializes new random number keys
+// NewKeys generates a new set of cryptographically random Zobrist keys.
 func NewKeys() *Keys {
 	z := &Keys{}
-
-	// Generate random values for all unique states
-	// We do not need to seed the generator, numbers may be the same each time
 
 	for square := range bitboard.NumberOfSquares {
 		for side := range bitboard.NumberOfColors {
@@ -57,8 +47,7 @@ func NewKeys() *Keys {
 	return z
 }
 
-// randUInt64 generate random number
-// https://stackoverflow.com/questions/44482738/random-64-bit-integer-from-crypto-rand
+// randUInt64 returns a cryptographically random 64-bit unsigned integer.
 func randUInt64() uint64 {
 	var b [8]byte
 	if _, err := rand.Read(b[:]); err != nil {

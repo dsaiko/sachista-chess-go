@@ -4,6 +4,8 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
+// rookMagicFile holds magic multiplier constants for each file,
+// used to map file occupancy states to a 6-bit lookup index.
 var rookMagicFile = [...]bitboard.Board{
 	0x8040201008040200,
 	0x4020100804020100,
@@ -39,7 +41,7 @@ func init() {
 		// get 6-bit mask for a file
 		rookMoveFileMask[i] = fileAMask << fieldIndex.File()
 
-		// index magic number directly fo field
+		// index magic number directly for the field
 		rookMoveFileMagic[i] = rookMagicFile[fieldIndex.File()]
 	}
 
@@ -139,6 +141,7 @@ func init() {
 	}
 }
 
+// oneRookAttacks computes the attack bitboard for a single rook using magic bitboard lookups.
 func oneRookAttacks(sourceIndex bitboard.Index, allPieces bitboard.Board) bitboard.Board {
 	// use magic multipliers to get occupancy state index
 	stateIndexRank := (allPieces & rookMoveRankMask[sourceIndex]) >> rookMoveRankShift[sourceIndex]
@@ -148,6 +151,7 @@ func oneRookAttacks(sourceIndex bitboard.Index, allPieces bitboard.Board) bitboa
 	return rookMoveRankAttacks[sourceIndex][stateIndexRank] | rookMoveFileAttacks[sourceIndex][stateIndexFile]
 }
 
+// rookAttacks returns the combined attack bitboard for all rooks and queens (rank/file) of the given color.
 func rookAttacks(board *Board, color Color) bitboard.Board {
 	pieces := board.Pieces[color][Rook] | board.Pieces[color][Queen]
 	attacks := bitboard.EmptyBoard
@@ -163,6 +167,7 @@ func rookAttacks(board *Board, color Color) bitboard.Board {
 	return attacks
 }
 
+// rookMoves generates all pseudo-legal rook and queen (rank/file) moves for the current side.
 func rookMoves(board *Board, handler MoveHandler) {
 	movingPiece := Rook
 	rook := board.Pieces[board.NextMove][movingPiece]

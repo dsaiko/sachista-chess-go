@@ -1,5 +1,6 @@
 package chessboard
 
+// Castling represents castling availability as a bitmask (king-side=1, queen-side=2).
 type Castling int
 
 const (

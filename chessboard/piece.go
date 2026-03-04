@@ -2,9 +2,10 @@ package chessboard
 
 import "strings"
 
+// Piece represents a chess piece type, used as an index into Board.Pieces.
 type Piece int
 
-// Piece index is used in ChessBoard.Pieces
+// Piece type constants, ordered to match their index in the Board.Pieces array.
 const (
 	King Piece = iota
 	Queen
@@ -14,9 +15,10 @@ const (
 	Pawn
 )
 
+// NoPiece is a sentinel value indicating the absence of a piece.
 const NoPiece Piece = -1
 
-// String representation of a piece for given color
+// String returns the algebraic notation letter for the piece (uppercase for White, lowercase for Black).
 func (p Piece) String(color Color) string {
 	c := "?"
 
@@ -42,7 +44,8 @@ func (p Piece) String(color Color) string {
 	return c
 }
 
-// PieceFromNotation returns piece and color from a notation string like 'p' or 'P'
+// PieceFromNotation returns the piece type and color from a single-character notation string
+// (e.g. "P" -> Pawn, White; "p" -> Pawn, Black).
 func PieceFromNotation(c string) (Piece, Color) {
 	color := White
 

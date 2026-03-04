@@ -4,6 +4,9 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
+// ApplyTo applies the move to the given board and returns the resulting position.
+// The board is taken by value so the caller's copy is not modified.
+// Handles all special moves: castling, en passant, pawn promotion, and incrementally updates the Zobrist hash.
 func (m *Move) ApplyTo(board Board) Board {
 	sourceIndex := m.From
 	targetIndex := m.To
@@ -159,6 +162,7 @@ func (m *Move) ApplyTo(board Board) Board {
 	return board
 }
 
+// absInt returns the absolute value of x.
 func absInt(x int) int {
 	if x < 0 {
 		return -x

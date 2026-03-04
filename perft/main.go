@@ -1,3 +1,5 @@
+// Command perft runs a chess move path enumeration (perft) to verify move generation correctness
+// and measure performance. It accepts an optional depth and FEN position as arguments.
 package main
 
 import (
@@ -53,11 +55,13 @@ func main() {
 	logger.info.Println("   time:  ", duration)
 }
 
+// Logger provides separate log outputs for informational messages (stdout) and errors (stderr).
 type Logger struct {
 	err  *log.Logger
 	info *log.Logger
 }
 
+// NewLogger creates a Logger with stdout for info and stderr for errors.
 func NewLogger() *Logger {
 	return &Logger{
 		info: log.New(os.Stdout, "", 0),

@@ -1,8 +1,9 @@
 package bitboard
 
+// BoardHeader is the column label line used in ASCII board rendering.
 const BoardHeader = "  a b c d e f g h\n"
 
-// Constants for Board of single piece on the bitboard
+// Pre-computed Board constants for a single piece on each square.
 const (
 	BoardA1 Board = 1
 	BoardB1 Board = 1 << 1
@@ -82,6 +83,7 @@ const (
 	UniverseBoard = ^EmptyBoard
 )
 
+// BoardFields maps each square index to its corresponding single-bit Board constant.
 var BoardFields = [...]Board{
 	BoardA1, BoardB1, BoardC1, BoardD1, BoardE1, BoardF1, BoardG1, BoardH1,
 	BoardA2, BoardB2, BoardC2, BoardD2, BoardE2, BoardF2, BoardG2, BoardH2,
@@ -93,6 +95,7 @@ var BoardFields = [...]Board{
 	BoardA8, BoardB8, BoardC8, BoardD8, BoardE8, BoardF8, BoardG8, BoardH8,
 }
 
+// BoardRanks contains bitmasks for each of the 8 ranks (rows), indexed 0-7 (rank 1 through rank 8).
 var BoardRanks = [...]Board{
 	BoardA1 | BoardB1 | BoardC1 | BoardD1 | BoardE1 | BoardF1 | BoardG1 | BoardH1,
 	BoardA2 | BoardB2 | BoardC2 | BoardD2 | BoardE2 | BoardF2 | BoardG2 | BoardH2,
@@ -104,6 +107,7 @@ var BoardRanks = [...]Board{
 	BoardA8 | BoardB8 | BoardC8 | BoardD8 | BoardE8 | BoardF8 | BoardG8 | BoardH8,
 }
 
+// BoardFiles contains bitmasks for each of the 8 files (columns), indexed 0-7 (a-file through h-file).
 var BoardFiles = [...]Board{
 	BoardA1 | BoardA2 | BoardA3 | BoardA4 | BoardA5 | BoardA6 | BoardA7 | BoardA8,
 	BoardB1 | BoardB2 | BoardB3 | BoardB4 | BoardB5 | BoardB6 | BoardB7 | BoardB8,
@@ -115,6 +119,7 @@ var BoardFiles = [...]Board{
 	BoardH1 | BoardH2 | BoardH3 | BoardH4 | BoardH5 | BoardH6 | BoardH7 | BoardH8,
 }
 
+// Convenience aliases for edge files and ranks.
 var (
 	BoardFileA = BoardFiles[0]
 	BoardFileH = BoardFiles[7]
@@ -125,8 +130,10 @@ var (
 	BoardRank8 = BoardRanks[7]
 )
 
+// BoardFrame is the union of all edge squares (ranks 1, 8 and files a, h).
 var BoardFrame = BoardRank1 | BoardRank8 | BoardFileA | BoardFileH
 
+// BoardA1H8 contains bitmasks for each of the 15 diagonals running from a1 toward h8.
 var BoardA1H8 = [...]Board{
 	BoardA8,
 	BoardA7 | BoardB8,
@@ -145,6 +152,7 @@ var BoardA1H8 = [...]Board{
 	BoardH1,
 }
 
+// BoardA8H1 contains bitmasks for each of the 15 anti-diagonals running from a8 toward h1.
 var BoardA8H1 = [...]Board{
 	BoardA1,
 	BoardA2 | BoardB1,

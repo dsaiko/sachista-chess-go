@@ -6,7 +6,8 @@ import (
 	"strconv"
 )
 
-// Board is representing 8x8 (64 bit) bitboard where each bit represent existing piece on the given position
+// Board represents an 8x8 chess board as a 64-bit unsigned integer,
+// where each bit corresponds to a square (bit 0 = a1, bit 63 = h8).
 type Board uint64
 
 // PopCount returns the number of bits set in the bitboard
@@ -14,78 +15,72 @@ func (b Board) PopCount() int {
 	return bits.OnesCount64(uint64(b))
 }
 
-// BitScan returns the index of first 1 bit or 64 if no bits are set
+// BitScan returns the index of the first set bit, or 64 if no bits are set.
 func (b Board) BitScan() Index {
 	return Index(bits.TrailingZeros64(uint64(b)))
 }
 
-// BitPop returns index of first set bit and resets this bit in the bitboard
+// BitPop returns the index of the first set bit and a new board with that bit cleared.
 func (b Board) BitPop() (Index, Board) {
 	return b.BitScan(), b & (b - 1)
 }
 
-// ShiftedOneNorth shifts all existing Board pieces by one
+// ShiftedOneNorth returns a board with all bits shifted one rank up.
 func (b Board) ShiftedOneNorth() Board {
 	return b << 8
 }
 
-// ShiftedOneSouth  shifts all existing Board pieces by one
+// ShiftedOneSouth returns a board with all bits shifted one rank down.
 func (b Board) ShiftedOneSouth() Board {
 	return b >> 8
 }
 
-// ShiftedOneEast  shifts all existing Board pieces by one
+// ShiftedOneEast returns a board with all bits shifted one file right, masking off wrap-around.
 func (b Board) ShiftedOneEast() Board {
 	return (b << 1) & ^BoardFileA
 }
 
-// ShiftedOneNorthEast  shifts all existing Board pieces by one
+// ShiftedOneNorthEast returns a board with all bits shifted one square diagonally (north-east).
 func (b Board) ShiftedOneNorthEast() Board {
 	return (b << 9) & ^BoardFileA
 }
 
-// ShiftedOneSouthEast  shifts all existing Board pieces by one
+// ShiftedOneSouthEast returns a board with all bits shifted one square diagonally (south-east).
 func (b Board) ShiftedOneSouthEast() Board {
 	return (b >> 7) & ^BoardFileA
 }
 
-// ShiftedOneWest  shifts all existing Board pieces by one
+// ShiftedOneWest returns a board with all bits shifted one file left, masking off wrap-around.
 func (b Board) ShiftedOneWest() Board {
 	return (b >> 1) & ^BoardFileH
 }
 
-// ShiftedOneSouthWest  shifts all existing Board pieces by one
+// ShiftedOneSouthWest returns a board with all bits shifted one square diagonally (south-west).
 func (b Board) ShiftedOneSouthWest() Board {
 	return (b >> 9) & ^BoardFileH
 }
 
-// ShiftedOneNorthWest  shifts all existing Board pieces by one
+// ShiftedOneNorthWest returns a board with all bits shifted one square diagonally (north-west).
 func (b Board) ShiftedOneNorthWest() Board {
 	return (b << 7) & ^BoardFileH
 }
 
-// Shifted shifts all existing Board pieces by multiple steps
+// Shifted returns a board with all bits shifted by dx files (positive=east) and dy ranks (positive=north).
 func (b Board) Shifted(dx int, dy int) Board {
-	// dy = up/down
 	if dy > 0 {
-		//goland:noinspection GoAssignmentToReceiver
 		b <<= dy * 8
 	}
 	if dy < 0 {
-		//goland:noinspection GoAssignmentToReceiver
 		b >>= (-dy) * 8
 	}
 
-	// dx = left / right
 	if dx > 0 {
 		for range dx {
-			//goland:noinspection GoAssignmentToReceiver
 			b = b.ShiftedOneEast()
 		}
 	}
 	if dx < 0 {
 		for i := 0; i < -dx; i++ {
-			//goland:noinspection GoAssignmentToReceiver
 			b = b.ShiftedOneWest()
 		}
 	}
@@ -93,7 +88,7 @@ func (b Board) Shifted(dx int, dy int) Board {
 	return b
 }
 
-// MirroredVertical returns bitboard with ranks (rows) in reverse order
+// MirroredVertical returns a board with ranks (rows) in reverse order.
 func (b Board) MirroredVertical() Board {
 	result := EmptyBoard
 
@@ -109,13 +104,12 @@ func (b Board) MirroredVertical() Board {
 	return result
 }
 
-// MirroredHorizontal returns bitboard which mirrors the bitboard horizontally
-//
-//goland:noinspection GoAssignmentToReceiver
+// MirroredHorizontal returns a board with files (columns) in reverse order.
+// Uses the delta swap technique with bit-manipulation masks for alternating bit groups.
 func (b Board) MirroredHorizontal() Board {
-	const k1 = Board(0x5555555555555555)
-	const k2 = Board(0x3333333333333333)
-	const k4 = Board(0x0f0f0f0f0f0f0f0f)
+	const k1 = Board(0x5555555555555555) // alternating single bits
+	const k2 = Board(0x3333333333333333) // alternating bit pairs
+	const k4 = Board(0x0f0f0f0f0f0f0f0f) // alternating nibbles
 
 	b = ((b >> 1) & k1) | ((b & k1) << 1)
 	b = ((b >> 2) & k2) | ((b & k2) << 2)
@@ -124,7 +118,7 @@ func (b Board) MirroredHorizontal() Board {
 	return b
 }
 
-// FlippedA1H8 returns bitboard flipped around A1H8 diagonal
+// FlippedA1H8 returns a board flipped along the a1-h8 diagonal (transpose).
 func (b Board) FlippedA1H8() Board {
 	const k1 = Board(0x5500550055005500)
 	const k2 = Board(0x3333000033330000)
@@ -141,20 +135,20 @@ func (b Board) FlippedA1H8() Board {
 	return b
 }
 
-// ToIndices returns array of indices set in the Board
+// ToIndices returns a slice of all set bit positions as Index values.
 func (b Board) ToIndices() []Index {
 	popCount := b.PopCount()
 
 	result := make([]Index, popCount)
 	i := 0
 	for b != EmptyBoard {
-		//goland:noinspection GoAssignmentToReceiver
 		result[i], b = b.BitPop()
 		i++
 	}
 	return result
 }
 
+// String returns an ASCII representation of the board with rank/file labels.
 func (b Board) String() string {
 	reversedRanks := b.MirroredVertical()
 	var buffer bytes.Buffer
@@ -187,7 +181,7 @@ func (b Board) String() string {
 	return buffer.String()
 }
 
-// BoardFromIndices returns Board filled with pieces defined by index parameters
+// BoardFromIndices returns a board with bits set at all specified index positions.
 func BoardFromIndices(indices ...Index) Board {
 	b := EmptyBoard
 	for i := range indices {
@@ -196,12 +190,12 @@ func BoardFromIndices(indices ...Index) Board {
 	return b
 }
 
-// BoardFromIndex returns Board of one piece index
+// BoardFromIndex returns a board with a single bit set at the given index.
 func BoardFromIndex(i Index) Board {
 	return 1 << i
 }
 
-// BoardFromNotation returns Board filled with pieces defined by notation parameters
+// BoardFromNotation returns a board with bits set at positions specified by algebraic notation strings (e.g. "e4", "d7").
 func BoardFromNotation(notations ...string) Board {
 	b := EmptyBoard
 	for i := range notations {

@@ -4,7 +4,7 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
-// attacks of all pieces
+// attacks returns a combined attack bitboard for all pieces of the given color.
 func attacks(board *Board, color Color) bitboard.Board {
 	return knightAttacks(board, color) |
 		pawnAttacks(board, color) |
@@ -13,7 +13,8 @@ func attacks(board *Board, color Color) bitboard.Board {
 		bishopAttacks(board, color)
 }
 
-// isBitmaskUnderAttack checks if certain squares are under attacks from opponent
+// isBitmaskUnderAttack reports whether any of the given squares are attacked by the specified color.
+// Uses short-circuit evaluation: returns as soon as any piece type attacks the squares.
 func isBitmaskUnderAttack(board *Board, color Color, fields bitboard.Board) bool {
 	switch {
 	case
@@ -28,7 +29,7 @@ func isBitmaskUnderAttack(board *Board, color Color, fields bitboard.Board) bool
 	}
 }
 
-// generatePseudoLegalMoves without checking legality of king check
+// generatePseudoLegalMoves generates all pseudo-legal moves (without filtering for king safety).
 func generatePseudoLegalMoves(b *Board, handler MoveHandler) {
 	knightMoves(b, handler)
 	pawnMoves(b, handler)
@@ -37,7 +38,8 @@ func generatePseudoLegalMoves(b *Board, handler MoveHandler) {
 	bishopMoves(b, handler)
 }
 
-// GenerateLegalMoves ...
+// GenerateLegalMoves returns all legal moves for the current position by generating
+// pseudo-legal moves and filtering out those that leave the king in check.
 func GenerateLegalMoves(b *Board) []Move {
 	const MovesCacheInitialCapacity = 32
 	legalMoves := make([]Move, 0, MovesCacheInitialCapacity)
@@ -52,9 +54,9 @@ func GenerateLegalMoves(b *Board) []Move {
 	return legalMoves
 }
 
-// isOpponentsKingNotUnderCheck for checking legality of the move
+// isOpponentsKingNotUnderCheck reports whether the opponent's king (the side that just moved)
+// is not in check. Used to verify move legality after applying a move.
 func isOpponentsKingNotUnderCheck(board *Board) bool {
-	// check if opponent king is not under check by my pieces
 	king := board.Pieces[board.OpponentColor()][King]
 
 	if king == bitboard.EmptyBoard {

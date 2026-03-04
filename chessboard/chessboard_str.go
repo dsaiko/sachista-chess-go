@@ -9,8 +9,8 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
-// String representation of the board plane
-// Does not keep castling or enPassant info
+// String returns an ASCII representation of the board with piece letters and rank/file labels.
+// Note: castling rights and en passant state are not included in the output.
 func (b *Board) String() string {
 	var buffer bytes.Buffer
 
@@ -81,8 +81,8 @@ func (b *Board) String() string {
 	return buffer.String()
 }
 
-// FromString representation of the board plane.
-// Does not keep castling or enPassant info
+// FromString parses an ASCII board representation (as produced by String) back into a Board.
+// Default values are used for castling rights, en passant, and move counters.
 func FromString(str string) Board {
 	var fenBuilder strings.Builder
 	reHeader := regexp.MustCompile("a b c d e f g h")

@@ -15,6 +15,46 @@ Still, the C++ version (with multithreading) is unbeaten in terms of performance
 
 ### Latest performance results:
 
+# 2026-03 - Performance optimization by Claude (Anthropic)
+
+The Go perft implementation was significantly optimized, achieving a ~3.2x speedup on Apple M4.
+The following optimizations were applied:
+
+1. **Transposition cache: `atomic.Value` to lockless uint64 arrays** -- Replaced the `[64M]atomic.Value` cache with two raw `[64M]uint64` arrays using Robert Hyatt's lockless hashing (XOR trick). This eliminated millions of interface boxing heap allocations per run. (~27% improvement)
+2. **Occupied bitboard cache** -- Added pre-computed `Occupied[2]bitboard.Board` fields to the Board struct, avoiding repeated OR-reduction of all piece bitboards on every `PiecesByColor()` / `AllPieces()` call. (~14% improvement)
+3. **`ApplyTo` returns Board by value** -- Changed `ApplyTo(board Board) *Board` to return `Board` by value, eliminating heap allocation of every new board state. (~11% improvement)
+4. **`perfT1` takes Board by value** -- Changed the recursive single-threaded perft function from pointer to value receiver. This was the single biggest win -- it kept the board and all temporaries on the stack, reducing heap allocations from 2.7M (480 MB) to ~80 (14 KB) per depth-6 run. (~42% improvement)
+5. **Removed `sync/atomic` from cache operations** -- On ARM64/x86-64, aligned 64-bit loads/stores are naturally atomic. Removing `atomic.LoadUint64`/`StoreUint64` (which use serializing LDAR/STLR instructions on ARM64) reduced cache lookup cost. The XOR consistency check safely detects any torn reads. (~5% improvement)
+6. **Inlined capture detection in `ApplyTo`** -- Replaced the `checkCapture` closure with a direct loop over piece types.
+7. **Branchless `OpponentColor`** -- Changed from if/else to `1 ^ b.NextMove`.
+8. **Profile-Guided Optimization (PGO)** -- Included a `default.pgo` profile for the Go compiler to devirtualize the move handler callback and optimize hot paths. (~3% improvement)
+
+**Apple M4 -- macOS (arm64)**
+
+Before optimization (Go 1.26):
+
+    sachista-chess-go perfT finished:
+    FEN:    rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+    depth:  7
+    count:  3,195,901,860
+    time:   3.36s
+
+After optimization:
+
+    sachista-chess-go perfT finished:
+    FEN:    rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+    depth:  7
+    count:  3,195,901,860
+    time:   ~1.05s
+
+    sachista-chess-go perfT finished:
+    FEN:    rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+    depth:  8
+    count:  84,998,978,956
+    time:   ~30s
+
+---
+
 2021-08
 
 **AMD Ryzen 7 3700X - Windows 10 WSL / Ubuntu**

@@ -4,6 +4,7 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
+// pawnAttacksCache stores pre-computed pawn attack squares for each color and square index.
 var pawnAttacksCache [bitboard.NumberOfColors][bitboard.NumberOfSquares]bitboard.Board
 
 func init() {
@@ -15,6 +16,7 @@ func init() {
 	}
 }
 
+// pawnAttacks returns the combined attack bitboard for all pawns of the given color.
 func pawnAttacks(board *Board, color Color) bitboard.Board {
 	if color == White {
 		return board.Pieces[color][Pawn].ShiftedOneNorthEast() | board.Pieces[color][Pawn].ShiftedOneNorthWest()
@@ -22,6 +24,8 @@ func pawnAttacks(board *Board, color Color) bitboard.Board {
 	return board.Pieces[color][Pawn].ShiftedOneSouthEast() | board.Pieces[color][Pawn].ShiftedOneSouthWest()
 }
 
+// pawnMoves generates all pseudo-legal pawn moves for the current side,
+// including single/double pushes, captures, promotions, and en passant.
 func pawnMoves(board *Board, handler MoveHandler) {
 	emptyBoard := ^board.AllPieces()
 
@@ -60,7 +64,6 @@ func pawnMoves(board *Board, handler MoveHandler) {
 			attacks = fromBitBoard.ShiftedOneSouthEast() | fromBitBoard.ShiftedOneSouthWest()
 		}
 
-		// attacks := pawnAttacksCache[board.NextMove][fromIndex]
 		movesBoard |= attacks & board.OpponentPieces()
 
 		// for all moves

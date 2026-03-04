@@ -4,6 +4,8 @@ import (
 	"saiko.cz/sachista/bitboard"
 )
 
+// bishopMagicA8H1 holds magic multiplier constants for each a8-h1 anti-diagonal,
+// used to map diagonal occupancy states to a 6-bit lookup index.
 var bishopMagicA8H1 = [...]bitboard.Board{
 	0x0,
 	0x0,
@@ -22,6 +24,7 @@ var bishopMagicA8H1 = [...]bitboard.Board{
 	0x0,
 }
 
+// bishopMagicA1H8 holds magic multiplier constants for each a1-h8 diagonal.
 var bishopMagicA1H8 = [...]bitboard.Board{
 	0x0,
 	0x0,
@@ -207,6 +210,7 @@ func init() {
 	}
 }
 
+// oneBishopAttacks computes the attack bitboard for a single bishop using magic bitboard lookups.
 func oneBishopAttacks(sourceIndex bitboard.Index, allPieces bitboard.Board) bitboard.Board {
 	stateIndexA8H1 := ((allPieces & bishopMoveA8H1Mask[sourceIndex]) * bishopMoveA8H1Magic[sourceIndex]) >> 57 //nolint:revive
 	stateIndexA1H8 := ((allPieces & bishopMoveA1H8Mask[sourceIndex]) * bishopMoveA1H8Magic[sourceIndex]) >> 57 //nolint:revive
@@ -215,11 +219,11 @@ func oneBishopAttacks(sourceIndex bitboard.Index, allPieces bitboard.Board) bitb
 	return bishopMoveA8H1Attacks[sourceIndex][stateIndexA8H1] | bishopMoveA1H8Attacks[sourceIndex][stateIndexA1H8]
 }
 
+// bishopAttacks returns the combined attack bitboard for all bishops and queens (diagonal) of the given color.
 func bishopAttacks(board *Board, color Color) bitboard.Board {
 	pieces := board.Pieces[color][Bishop] | board.Pieces[color][Queen]
 	attacks := bitboard.EmptyBoard
 
-	// for all rooks
 	allPieces := board.AllPieces()
 	var i bitboard.Index
 	for pieces != bitboard.EmptyBoard {
@@ -229,6 +233,7 @@ func bishopAttacks(board *Board, color Color) bitboard.Board {
 	return attacks
 }
 
+// bishopMoves generates all pseudo-legal bishop and queen (diagonal) moves for the current side.
 func bishopMoves(board *Board, handler MoveHandler) {
 	movingPiece := Bishop
 	bishop := board.Pieces[board.NextMove][movingPiece]
@@ -239,10 +244,7 @@ func bishopMoves(board *Board, handler MoveHandler) {
 	var fromIndex, toIndex bitboard.Index
 
 	for range 2 { // bishops and queens
-		// for all rooks
 		for bishop != bitboard.EmptyBoard {
-			// get next rook
-
 			fromIndex, bishop = bishop.BitPop()
 			movesBoard := oneBishopAttacks(fromIndex, allPieces) & boardAvailable
 
