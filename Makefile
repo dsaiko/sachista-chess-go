@@ -18,7 +18,7 @@ bench:
 	go test ./chessboard/... -run=^$$ -bench=. -benchmem -benchtime=3x
 
 race:
-	go test -race -skip TestPerfT ./...
+	go test -race -skip '^TestPerfT$$' ./...
 
 cover:
 	go test ./... -coverprofile=coverage.out

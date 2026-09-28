@@ -52,3 +52,32 @@ func TestBoard_ToFEN_Invalid(t *testing.T) {
 	assert.Equal(t, uint64(0), b2.ZobristHash)
 	assert.Equal(t, bitboard.EmptyBoard, b2.AllPieces())
 }
+
+func TestBoardFromFEN_NoCastling(t *testing.T) {
+	// kings and rooks on their home squares, but '-' grants no castling
+	b := BoardFromFEN("r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1")
+	assert.Equal(t, CastlingNone, b.Castling[White])
+	assert.Equal(t, CastlingNone, b.Castling[Black])
+	assert.Equal(t, "r3k2r/8/8/8/8/8/8/R3K2R w - - 0 1", b.ToFEN())
+
+	// characters other than KQkq are ignored
+	b = BoardFromFEN("r3k2r/8/8/8/8/8/8/R3K2R w Kxq - 0 1")
+	assert.Equal(t, CastlingKingSide, b.Castling[White])
+	assert.Equal(t, CastlingQueenSide, b.Castling[Black])
+}
+
+func TestBoardFromFEN_InvalidEnPassant(t *testing.T) {
+	for _, ep := range []string{"zz", "i3", "a9", "a0", "E3", "3e"} {
+		t.Run(ep, func(t *testing.T) {
+			var b Board
+			assert.NotPanics(t, func() {
+				b = BoardFromFEN("4k3/8/8/8/4P3/8/8/4K3 b - " + ep + " 0 1")
+			})
+			assert.Equal(t, bitboard.Index(0), b.EnPassantTarget)
+			assert.Equal(t, b.Hash(), b.ZobristHash)
+		})
+	}
+
+	b := BoardFromFEN("4k3/8/8/8/4P3/8/8/4K3 b - e3 0 1")
+	assert.Equal(t, bitboard.IndexE3, b.EnPassantTarget)
+}

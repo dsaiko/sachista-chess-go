@@ -1,6 +1,8 @@
 package chessboard
 
 import (
+	"sync/atomic"
+
 	"saiko.cz/sachista/bitboard"
 )
 
@@ -14,8 +16,9 @@ const cacheCountMask = uint64(0x00FFFFFFFFFFFFFF)
 const cacheDepthShift = 56
 
 // PerfTCache uses lockless hashing (XOR trick) with two uint64 arrays.
-// On ARM64/x86-64, aligned 64-bit loads/stores are naturally atomic;
-// the XOR consistency check in get() detects any torn or stale reads.
+// Each word is accessed atomically, so concurrent PerfT goroutines are race-free
+// on every GOARCH; the XOR consistency check in get() detects a key and value
+// written by different set() calls. Measured cost versus plain loads/stores is within noise.
 type PerfTCache struct {
 	keys   *[CacheSize]uint64 // stores hash XOR value (for consistency check)
 	values *[CacheSize]uint64 // stores packed (depth << 56) | count
@@ -33,15 +36,15 @@ func newPerfTCache() *PerfTCache {
 func (c *PerfTCache) set(hash uint64, depth int, count uint64) {
 	idx := (CacheSize - 1) & hash
 	value := (uint64(depth) << cacheDepthShift) | (count & cacheCountMask) //nolint:gosec
-	c.values[idx] = value
-	c.keys[idx] = hash ^ value
+	atomic.StoreUint64(&c.values[idx], value)
+	atomic.StoreUint64(&c.keys[idx], hash^value)
 }
 
 // get retrieves a cached perft result. Returns 0 on cache miss or consistency check failure.
 func (c *PerfTCache) get(hash uint64, depth int) uint64 {
 	idx := (CacheSize - 1) & hash
-	value := c.values[idx]
-	key := c.keys[idx]
+	value := atomic.LoadUint64(&c.values[idx])
+	key := atomic.LoadUint64(&c.keys[idx])
 	if key^value != hash {
 		return 0
 	}
@@ -102,7 +105,12 @@ func perfT1(b Board, depth int) uint64 {
 
 // PerfT runs a multi-threaded perft (performance test, move path enumeration) to the given depth.
 // A goroutine is spawned for each top-level legal move to utilize all available CPU cores.
+// Depth 0 (or less) counts the position itself and returns 1.
 func PerfT(b *Board, depth int) uint64 {
+	if depth <= 0 {
+		return 1
+	}
+
 	moves := GenerateLegalMoves(b)
 	results := make(chan uint64, len(moves))
 
