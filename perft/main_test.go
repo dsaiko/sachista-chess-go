@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"saiko.cz/sachista/chessboard"
 )
 
@@ -32,10 +33,10 @@ func TestParseArgs(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			board, depth, err := parseArgs(tc.args)
 			if tc.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 				return
 			}
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tc.wantDepth, depth)
 			assert.Equal(t, tc.wantFEN, board.ToFEN())
 		})

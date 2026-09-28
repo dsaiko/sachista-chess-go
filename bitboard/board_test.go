@@ -1,7 +1,6 @@
 package bitboard
 
 import (
-	"fmt"
 	"slices"
 	"testing"
 
@@ -53,7 +52,7 @@ func TestBitBoard_ToIndices(t *testing.T) {
 		return slices.Contains(indices, i)
 	}
 
-	assert.Equal(t, 5, len(indices))
+	assert.Len(t, indices, 5)
 	assert.True(t, contains(IndexA1))
 	assert.True(t, contains(IndexA8))
 	assert.True(t, contains(IndexH1))
@@ -62,7 +61,7 @@ func TestBitBoard_ToIndices(t *testing.T) {
 
 	board = EmptyBoard
 	indices = board.ToIndices()
-	assert.Equal(t, 0, len(indices))
+	assert.Empty(t, indices)
 }
 
 func TestBitBoard_OneWest(t *testing.T) {
@@ -195,5 +194,5 @@ func TestBitBoard_String(t *testing.T) {
   a b c d e f g h
 `
 
-	assert.Equal(t, expected, fmt.Sprintf("%v", b))
+	assert.Equal(t, expected, b.String())
 }

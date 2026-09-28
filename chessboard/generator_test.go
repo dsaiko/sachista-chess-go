@@ -60,7 +60,7 @@ func TestGenerateLegalMoves(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			moves := GenerateLegalMoves(&tt.board)
-			assert.Equal(t, tt.want, len(moves))
+			assert.Len(t, moves, tt.want)
 		})
 	}
 }
