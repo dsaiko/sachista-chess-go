@@ -1,4 +1,4 @@
-GOLANGCI_LINT_VERSION := v2.10.1
+GOLANGCI_LINT_VERSION := v2.14.0
 
 .PHONY: build codecheck test perft bench race cover clean pgo lint
 
