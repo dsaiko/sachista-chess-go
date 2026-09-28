@@ -11,9 +11,17 @@ output:
       print-issued-lines: true
       print-linter-name: true
 
+issues:
+  max-issues-per-linter: 0 # report everything, not only the first 50
+  max-same-issues: 0
+
 linters:
   default: none
   enable:
+    # standard set - not enabled implicitly with `default: none`
+    - errcheck     # Checks for unchecked errors.
+    - govet        # Reports suspicious constructs (go vet).
+    - unused       # Finds unused constants, variables, functions and types.
     - gocritic     # Diagnostics for bugs, performance and style issues.
     - prealloc     # Finds slice declarations that could potentially be pre-allocated.
     - gosec        # Inspects source code for security problems.
@@ -29,11 +37,26 @@ linters:
     - nakedret     # Checks that functions with naked returns are not longer than a maximum size.
     - perfsprint   # Checks that fmt.Sprintf can be replaced with a faster alternative.
     - misspell     # Finds commonly misspelled English words.
+    - modernize    # Suggests newer Go language and standard library idioms.
+    - intrange     # Finds loops that could use an integer range (Go 1.22+).
+    - testifylint  # Checks usage of github.com/stretchr/testify.
+    - usetesting   # Reports calls that have a testing package replacement.
+    - wastedassign # Finds assignments whose value is never used.
+    - predeclared  # Finds code that shadows predeclared identifiers.
   exclusions:
     paths:
       - vendor
       - .github
   settings:
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment # Board field order is kept readable; the struct is copied by value on purpose
+    gocritic:
+      enabled-tags: [ diagnostic, performance, style ]
+      disabled-checks:
+        - hugeParam # Board (~170 B) is passed by value on purpose, it keeps perft on the stack
+        - whyNoLint # the nolint directives only silence revive add-constant on bit masks and shifts
     misspell:
       locale: US
     perfsprint:

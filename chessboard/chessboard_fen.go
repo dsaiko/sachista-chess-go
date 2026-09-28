@@ -71,7 +71,7 @@ func (b *Board) ToFEN() string {
 			c = Pawn.String(Black)
 		}
 
-		if len(c) != 0 {
+		if c != "" {
 			spaces = outputSpaces(spaces)
 			buffer.WriteString(c)
 		} else {

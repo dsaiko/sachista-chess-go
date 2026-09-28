@@ -74,7 +74,7 @@ func (b Board) ShiftedOneNorthWest() Board {
 }
 
 // Shifted returns a board with all bits shifted by dx files (positive=east) and dy ranks (positive=north).
-func (b Board) Shifted(dx int, dy int) Board {
+func (b Board) Shifted(dx, dy int) Board {
 	if dy > 0 {
 		b <<= dy * 8
 	}
@@ -88,7 +88,7 @@ func (b Board) Shifted(dx int, dy int) Board {
 		}
 	}
 	if dx < 0 {
-		for i := 0; i < -dx; i++ {
+		for range -dx {
 			b = b.ShiftedOneWest()
 		}
 	}

@@ -1,16 +1,15 @@
 package bitboard
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestIndex_String(t *testing.T) {
-	f7 := fmt.Sprintf("%v", IndexF7)
-	a1 := fmt.Sprintf("%v", IndexA1)
-	h8 := fmt.Sprintf("%v", IndexH8)
+	f7 := IndexF7.String()
+	a1 := IndexA1.String()
+	h8 := IndexH8.String()
 
 	assert.Equal(t, "f7", f7)
 	assert.Equal(t, "a1", a1)
