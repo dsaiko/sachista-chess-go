@@ -195,14 +195,14 @@ func BoardFromFEN(fen string) Board {
 			break
 		}
 
+		// only K, Q, k, q grant castling; '-' and anything else is ignored
 		piece, color := PieceFromNotation(string(c))
-
-		castling := CastlingQueenSide
-		if piece == King {
-			castling = CastlingKingSide
+		switch piece {
+		case King:
+			b.Castling[color] |= CastlingKingSide
+		case Queen:
+			b.Castling[color] |= CastlingQueenSide
 		}
-
-		b.Castling[color] |= castling
 	}
 
 	// enPassant
@@ -218,7 +218,8 @@ func BoardFromFEN(fen string) Board {
 			notation += string(c)
 		}
 
-		if len(notation) == 2 {
+		// accept only a square on the board, so the index is always valid for Zobrist lookups
+		if len(notation) == 2 && notation[0] >= 'a' && notation[0] <= 'h' && notation[1] >= '1' && notation[1] <= '8' {
 			b.EnPassantTarget = bitboard.IndexFromNotation(notation)
 		}
 	}

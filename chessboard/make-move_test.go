@@ -184,6 +184,66 @@ func TestApplyTo_CaptureRookRevokesCastling(t *testing.T) {
 	result := m.ApplyTo(board)
 	assert.Equal(t, CastlingQueenSide, result.Castling[White])
 	assert.Equal(t, CastlingQueenSide, result.Castling[Black]) // king-side lost
+	assert.Equal(t, bitboard.BoardA8, result.Pieces[Black][Rook])
+	assert.Equal(t, result.Hash(), result.ZobristHash)
+	assertOccupiedConsistent(t, &result)
+}
+
+func TestApplyTo_Captures(t *testing.T) {
+	tests := []struct {
+		name         string
+		fen          string
+		move         Move
+		captured     Piece
+		wantCastling [2]Castling
+	}{
+		{
+			name:         "black captures white rook on a1",
+			fen:          "r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1",
+			move:         Move{Piece: Rook, From: bitboard.IndexA8, To: bitboard.IndexA1},
+			captured:     Rook,
+			wantCastling: [2]Castling{CastlingKingSide, CastlingKingSide},
+		},
+		{
+			name:         "black captures white rook on h1",
+			fen:          "r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1",
+			move:         Move{Piece: Rook, From: bitboard.IndexH8, To: bitboard.IndexH1},
+			captured:     Rook,
+			wantCastling: [2]Castling{CastlingQueenSide, CastlingQueenSide},
+		},
+		{
+			name:         "white captures a non-rook on a8 keeps black castling",
+			fen:          "n3k2r/8/8/8/8/8/8/R3K3 w Qk - 0 1",
+			move:         Move{Piece: Rook, From: bitboard.IndexA1, To: bitboard.IndexA8},
+			captured:     Knight,
+			wantCastling: [2]Castling{CastlingNone, CastlingKingSide},
+		},
+		{
+			name:         "promotion with capture",
+			fen:          "1n2k3/P7/8/8/8/8/8/4K3 w - - 0 1",
+			move:         Move{Piece: Pawn, From: bitboard.IndexA7, To: bitboard.IndexB8, PromotionPiece: Queen},
+			captured:     Knight,
+			wantCastling: [2]Castling{CastlingNone, CastlingNone},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			board := BoardFromFEN(tc.fen)
+			opponent := board.OpponentColor()
+			target := bitboard.BoardFromIndex(tc.move.To)
+			assert.NotZero(t, board.Pieces[opponent][tc.captured]&target)
+
+			result := tc.move.ApplyTo(board)
+
+			assert.Zero(t, result.Pieces[opponent][tc.captured]&target, "captured piece removed")
+			assert.Zero(t, result.Occupied[opponent]&target, "opponent no longer occupies target")
+			assert.Equal(t, tc.wantCastling, result.Castling)
+			assert.Equal(t, 0, result.HalfMoveClock)
+			assert.Equal(t, result.Hash(), result.ZobristHash)
+			assertOccupiedConsistent(t, &result)
+		})
+	}
 }
 
 func TestApplyTo_EnPassantTargetSet(t *testing.T) {
@@ -228,10 +288,12 @@ func TestZobristFailScenarion1(t *testing.T) {
 func TestZobrist(t *testing.T) {
 	board := BoardFromFEN("r4rk1/p2pqpb1/bn2pnp1/2pP4/1p2P3/3N1Q1p/PPPBBPPP/RN2K2R w KQ c6 0 3")
 
-	for range 1000 {
+	for i := range 1000 {
 		moves := GenerateLegalMoves(&board)
 		board = moves[0].ApplyTo(board)
+		if board.Hash() != board.ZobristHash {
+			t.Fatalf("move %d (%v): incremental hash differs from recomputed hash", i, moves[0].String())
+		}
+		assertOccupiedConsistent(t, &board)
 	}
-
-	assert.Equal(t, board.ZobristHash, board.Hash())
 }

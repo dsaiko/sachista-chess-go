@@ -25,6 +25,7 @@ The following optimizations were applied:
 3. **`ApplyTo` returns Board by value** -- Changed `ApplyTo(board Board) *Board` to return `Board` by value, eliminating heap allocation of every new board state. (~11% improvement)
 4. **`perfT1` takes Board by value** -- Changed the recursive single-threaded perft function from pointer to value receiver. This was the single biggest win -- it kept the board and all temporaries on the stack, reducing heap allocations from 2.7M (480 MB) to ~80 (14 KB) per depth-6 run. (~42% improvement)
 5. **Removed `sync/atomic` from cache operations** -- On ARM64/x86-64, aligned 64-bit loads/stores are naturally atomic. Removing `atomic.LoadUint64`/`StoreUint64` (which use serializing LDAR/STLR instructions on ARM64) reduced cache lookup cost. The XOR consistency check safely detects any torn reads. (~5% improvement)
+   *2026-09 update:* atomic loads/stores were reintroduced. Re-measured on Apple M4 with Go 1.26, the difference against plain loads/stores is within run-to-run noise (depth 7 ~1.15s both), and the atomics make the cache race-free under the Go memory model, so `make race` now covers the concurrent PerfT path.
 6. **Inlined capture detection in `ApplyTo`** -- Replaced the `checkCapture` closure with a direct loop over piece types.
 7. **Branchless `OpponentColor`** -- Changed from if/else to `1 ^ b.NextMove`.
 8. **Profile-Guided Optimization (PGO)** -- Used a `default.pgo` profile for the Go compiler to devirtualize the move handler callback and optimize hot paths. (~3% improvement)

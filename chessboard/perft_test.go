@@ -59,10 +59,66 @@ func TestPerfT(t *testing.T) {
 	}
 }
 
+// TestPerfTShallow runs PerfT at small depths so that `make race` covers the goroutine fan-out
+// and the shared cache without the cost of TestPerfT.
+func TestPerfTShallow(t *testing.T) {
+	tests := []struct {
+		fen   string
+		depth int
+		want  uint64
+	}{
+		{fen: StandardBoardFEN, depth: 0, want: 1},
+		{fen: StandardBoardFEN, depth: -1, want: 1},
+		{fen: StandardBoardFEN, depth: 1, want: 20},
+		{fen: StandardBoardFEN, depth: 3, want: 8_902},
+		{fen: "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -", depth: 3, want: 97_862},
+		{fen: "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -", depth: 4, want: 43_238},
+	}
+	for _, tc := range tests {
+		b := BoardFromFEN(tc.fen)
+		assert.Equal(t, tc.want, PerfT(&b, tc.depth), "%v depth %v", tc.fen, tc.depth)
+	}
+}
+
+func TestPerfTCache(t *testing.T) {
+	c := newPerfTCache()
+	const hash = uint64(0xDEADBEEF12345678)
+
+	assert.Equal(t, uint64(0), c.get(hash, 3), "empty cache misses")
+
+	c.set(hash, 3, 1234)
+	assert.Equal(t, uint64(1234), c.get(hash, 3), "hit returns the stored count")
+	assert.Equal(t, uint64(0), c.get(hash, 2), "depth mismatch misses")
+
+	// a different hash mapping to the same slot must not see the entry
+	other := hash + CacheSize
+	assert.Equal(t, uint64(0), c.get(other, 3), "same slot, different hash misses")
+
+	// the newer entry replaces the older one in the slot
+	c.set(other, 3, 99)
+	assert.Equal(t, uint64(99), c.get(other, 3))
+	assert.Equal(t, uint64(0), c.get(hash, 3))
+
+	// a key and value written by different set() calls fail the XOR check
+	idx := (CacheSize - 1) & hash
+	c.set(hash, 3, 1234)
+	c.values[idx] ^= 1
+	assert.Equal(t, uint64(0), c.get(hash, 3), "inconsistent key/value misses")
+
+	// counts are stored in the low 56 bits
+	c.set(hash, 5, cacheCountMask)
+	assert.Equal(t, cacheCountMask, c.get(hash, 5))
+}
+
 func BenchmarkPerfT(b *testing.B) {
 	board := StandardBoard()
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
+		// start every iteration with an empty cache, otherwise all but the first run are pure cache hits
+		b.StopTimer()
+		cache = newPerfTCache()
+		b.StartTimer()
+
 		PerfT(&board, 6)
 	}
 }
